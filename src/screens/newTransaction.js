@@ -1,0 +1,310 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, Picker, Image, KeyboardAvoidingView , ScrollView, AsyncStorage} from 'react-native';
+import colors from '../static/color'
+import * as ImagePicker from 'expo-image-picker';
+import Icons from 'react-native-vector-icons/AntDesign';
+import { Button, ButtonGroup } from 'react-native-elements';
+import Constants from 'expo-constants';
+import storeNewEntry from "../services/storeNewTransaction"
+
+
+const débit = () => <Icons size={25} color={colors.CUS_WHITE} name="minus"></Icons>
+const crédit = () => <Icons size={25} color={colors.CUS_WHITE} name="plus"></Icons>
+
+export default function componentName({ navigation: { goBack } }) {
+
+  //data pour nouvelle entry
+  //0 = débit, 1 = crédit
+  const [typeTransaction, setTransaction] = useState(0);
+  const [montant, setMontant] = useState(0);
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("null");
+  const [devise, setDevise] = useState("CHF");
+  //utilitaire
+  const [accepted, setAccepted] = useState(false);
+
+  const buttons = [{ element: débit }, { element: crédit }]
+
+  const updateType = function (type) {
+    setTransaction(type);
+  }
+
+  const storeData = function(){
+      const entry = {
+        "typeTransaction" : typeTransaction,
+        "description" : description,
+        "montant" : montant,
+        "image" : image,
+        "devise" : devise
+      }
+      storeNewEntry(entry);
+  }
+
+  const updateDevise = function(currency){
+    setDevise(currency)
+  };
+
+  const updateDescription = function(desc){
+    setDescription(desc)
+  };
+
+  const updateMontant = function(montant){
+    setMontant(montant)
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (Constants.platform.ios) {
+        const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Désolé, nous avons besoin des autorisations de caméra pour que cela fonctionne!');
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      quality: 0.3,
+      base64: true,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.base64);
+      setAccepted(true);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView style={styles.main}>
+      <ScrollView style={{marginTop:25}}>
+      <View style={styles.containerTitle}>
+        <View style={styles.goBack}>
+          <TouchableWithoutFeedback onPress={() => goBack()}>
+            <Icons size={35} color={colors.LIGHT_PRIMARY} name="back"></Icons>
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text numberOfLines={1} style={styles.title}>Nouvelle transaction</Text>
+        </View>
+        <View style={styles.goBack} />
+      </View>
+
+      <View style={styles.containerSolde}>
+        <Text style={styles.textSolde}>4594 CHF</Text>
+      </View>
+
+      {/* Container des input */}
+      <View style={styles.containerTransactions}>
+
+        {/* Input type de transaction */}
+        <ButtonGroup
+          onPress={(type) => updateType(type)}
+          selectedIndex={typeTransaction}
+          buttons={buttons}
+          buttonStyle={styles.buttonTypeStyle}
+          selectedButtonStyle={{ backgroundColor: colors.LIGHT_PRIMARY }}
+          innerBorderStyle={{ color: colors.LIGHT_PRIMARY }}
+          containerStyle={{ borderColor: colors.LIGHT_PRIMARY, borderRadius: 25, width: '100%', marginLeft: 0, marginBottom: 15 }}
+        />
+
+        {/* Input description */}
+        <TextInput style={styles.textAmount} onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
+
+        {/* Input container montant + devise */}
+        <View style={styles.containerAmountCurr}>
+          <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
+          <View style={styles.textAmountCurr}>
+            <Picker
+              selectedValue={devise}
+              style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
+              onValueChange={(itemValue, itemIndex) => updateDevise(itemValue)}
+            >
+              <Picker.Item label="CHF" value="CHF" />
+              <Picker.Item label="EUR" value="EUR" />
+            </Picker>
+          </View>
+        </View>
+
+         {/* Input ticket a upload */}
+        <Button
+          icon={
+            <Icons
+              name={accepted ? "check" : "camera"}
+              size={35}
+              color={accepted ? colors.GREEN : "white"}
+            />
+          }
+          iconRight
+          type="outline"
+          onPress={pickImage}
+          buttonStyle={styles.button}
+          titleStyle={styles.buttonTitle}
+          containerStyle={{ width: '100%', marginLeft: 0 }}
+        />
+      </View>
+      <View style={styles.ContainerButtonAccept}>
+      <Button       
+                    onPress={()=>storeData()}
+                    title="Sauvegarder"
+                    type="outline"
+                    buttonStyle={styles.buttonSave}
+                    titleStyle={styles.buttonSaveTitle}
+                    containerStyle={{width: '100%',marginLeft:0}}
+                />
+      </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    backgroundColor: colors.DARK_PRIMARY
+  },
+  title: {
+    fontSize: 20,
+    color: colors.CUS_WHITE
+  },
+  containerSolde: {
+    flex: 1,
+    marginHorizontal: 15,
+    alignItems: 'center',
+    paddingVertical:25
+  },
+  containerTitle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginHorizontal: 15
+  },
+  saveContainer: {
+    flex: 1,
+    marginHorizontal: 15,
+    justifyContent: 'center'
+  },
+  containerTransactions: {
+    flex: 3,
+    marginHorizontal: 15,
+    paddingBottom: 15,
+  },
+
+  ContainerButtonAccept: {
+    flex: 2,
+    justifyContent:"flex-end",
+    marginHorizontal: 15,
+    paddingBottom: 15,
+  },
+  textSolde: {
+    textAlign: 'right',
+    fontSize: 50,
+    color: colors.GREEN
+  },
+  containerDetails: {
+    flex: 1,
+    marginHorizontal: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row'
+  },
+  goBack: {
+    flex: 1
+  },
+  titleContainer: {
+    flex: 3,
+    alignItems: 'center',
+  },
+  updateTransa: {
+    flex: 1,
+  },
+  typeTransa: {
+    flex: 2,
+  },
+  amountTransa: {
+    flex: 3,
+    paddingRight: 5,
+  },
+  textTypeTransa: {
+    fontSize: 20,
+    color: colors.CUS_WHITE
+  },
+  textAmount: {
+    fontSize: 18,
+    borderRadius: 25,
+    color: colors.LIGHT_WHITE,
+    borderWidth: 1,
+    marginBottom: 15,
+    height: 40,
+    paddingLeft: 15,
+    borderColor: colors.LIGHT_PRIMARY,
+    backgroundColor: colors.LIGHT_PRIMARY
+  },
+  inputFile: {
+    fontSize: 18,
+    borderRadius: 25,
+    color: colors.LIGHT_WHITE,
+    borderWidth: 1,
+    marginBottom: 15,
+    height: 40,
+    paddingLeft: 15,
+    borderColor: colors.LIGHT_PRIMARY,
+    backgroundColor: colors.LIGHT_PRIMARY
+  },
+  textAmountCurr: {
+    borderRadius: 25,
+    color: colors.LIGHT_WHITE,
+    borderWidth: 1,
+    overflow: 'hidden',
+    flex: 1,
+    height: 40,
+    borderColor: colors.LIGHT_PRIMARY,
+    backgroundColor: colors.LIGHT_PRIMARY
+  },
+  textAmountMontant: {
+    fontSize: 18,
+    borderRadius: 25,
+    color: colors.LIGHT_WHITE,
+    borderWidth: 1,
+    flex: 3,
+    height: 40,
+    paddingLeft: 15,
+    marginRight: 5,
+    borderColor: colors.LIGHT_PRIMARY,
+    backgroundColor: colors.LIGHT_PRIMARY
+  },
+  button: {
+    borderColor: colors.LIGHT_PRIMARY,
+    borderRadius: 25,
+    backgroundColor: colors.LIGHT_PRIMARY,
+    height: 80
+  },
+  buttonSave: {
+    borderColor: colors.GREEN,
+    borderRadius: 25,
+    backgroundColor: colors.DARK_PRIMARY,
+    height: 45
+  },
+  buttonSaveTitle: {
+    color: colors.GREEN,
+  },
+  buttonTitle: {
+    color: colors.LIGHT_WHITE,
+    paddingRight: 15
+  },
+  buttonTypeTextStyle: {
+    fontSize: 40
+  },
+  buttonTypeStyle: {
+    backgroundColor: colors.DARK_PRIMARY,
+    borderColor: colors.LIGHT_PRIMARY
+  },
+  containerAmountCurr: {
+    flexDirection: 'row',
+    marginBottom: 15
+  }
+});
