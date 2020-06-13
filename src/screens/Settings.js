@@ -2,18 +2,34 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
 import colors from '../static/color'
 import { Button, Divider } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux'
+import { addcamp } from '../redux/campsApp'
+
+
 
 export default function Settings({ navigation }) {
 
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [name, setName] = useState(null);
+  const [amount, setAmount] = useState(null);
 
+  const camps = useSelector(state => state)
+  const dispatch = useDispatch()
+  const addCamp = note => dispatch(addcamp(note))
+
+  const storeCampInfos = function(){
+    const camp ={name:name, solde:amount};
+    addCamp(camp);
+  }
+
+
+  const nouveauCamp = async () => {
+  }
 
   const updateName = function (val) {
     setName(val)
   };
 
-  const updateVal = function (val) {
+  const updateSolde = function (val) {
     setAmount(val)
   };
 
@@ -30,13 +46,12 @@ export default function Settings({ navigation }) {
           <TextInput keyboardType="number-pad" style={styles.textAmount} onChangeText={(value) => updateSolde(value)} placeholder="Montant"></TextInput>
         </View>
         <View style={styles.containerGenInput2}>
-
           <Button
             title="Sauvegarder"
             type="outline"
             buttonStyle={styles.buttonGen}
             titleStyle={styles.buttonGenTitle}
-
+            onPress={()=>storeCampInfos()}
           />
         </View>
       </View>
@@ -50,7 +65,6 @@ export default function Settings({ navigation }) {
             type="outline"
             buttonStyle={styles.buttonGen}
             titleStyle={styles.buttonGenTitle}
-
           />
         </View>
         <View style={styles.containerGenInput4}>
@@ -69,6 +83,7 @@ export default function Settings({ navigation }) {
           type="outline"
           buttonStyle={styles.buttonReset}
           titleStyle={styles.buttonResetTitle}
+          onPress={()=>nouveauCamp()}
         />
       </View>
     </ScrollView>

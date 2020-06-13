@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, Picker, Image, KeyboardAvoidingView , ScrollView, AsyncStorage} from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, Picker, Image, KeyboardAvoidingView, ScrollView, AsyncStorage } from 'react-native';
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
@@ -8,13 +8,17 @@ import Constants from 'expo-constants';
 import storeNewEntry from "../services/storeNewTransaction"
 
 
-const débit = () => <Icons size={25} color={colors.CUS_WHITE} name="minus"></Icons>
-const crédit = () => <Icons size={25} color={colors.CUS_WHITE} name="plus"></Icons>
+let débit = () => <Icons size={25} color={colors.CUS_WHITE} name="minus"></Icons>
+let crédit = () => <Icons size={25} color={colors.CUS_WHITE} name="plus"></Icons>
+let gelé = () => <Icons size={20} color={colors.CUS_WHITE} name="reload1"></Icons>
+
 
 export default function componentName({ navigation: { goBack } }) {
 
   //data pour nouvelle entry
   //0 = débit, 1 = crédit
+  const [newSolde, setNewSolde] = useState(4594);
+  const [soldeActuel, setSolde] = useState(4594);
   const [typeTransaction, setTransaction] = useState(0);
   const [montant, setMontant] = useState(0);
   const [description, setDescription] = useState("");
@@ -23,33 +27,65 @@ export default function componentName({ navigation: { goBack } }) {
   //utilitaire
   const [accepted, setAccepted] = useState(false);
 
-  const buttons = [{ element: débit }, { element: crédit }]
+  const buttons = [{ element: débit }, { element: crédit }, { element: gelé }]
+
+
+  useEffect(() => {
+    console.log("helo");
+    const newSolde = calcNewSolde(typeTransaction, montant);
+    setNewSolde(newSolde);
+  }, [typeTransaction])
+
+  useEffect(() => {
+    console.log("helo");
+    const newSolde = calcNewSolde(typeTransaction, montant);
+    setNewSolde(newSolde);
+  }, [montant])
+
 
   const updateType = function (type) {
     setTransaction(type);
   }
 
-  const storeData = function(){
-      const entry = {
-        "typeTransaction" : typeTransaction,
-        "description" : description,
-        "montant" : montant,
-        "image" : image,
-        "devise" : devise
-      }
-      storeNewEntry(entry);
+  const calcNewSolde = function (typeTransa, montantA) {
+    let newSoldeV = soldeActuel;
+
+    switch (typeTransa) {
+      case 0:
+        newSoldeV = soldeActuel - montantA;
+        break;
+      case 1:
+        newSoldeV = soldeActuel + montantA / 1;
+        break;
+      default:
+        newSoldeV = soldeActuel - montantA;
+        break;
+    }
+
+    return newSoldeV;
   }
 
-  const updateDevise = function(currency){
+  const storeData = function () {
+    const entry = {
+      "typeTransaction": typeTransaction,
+      "description": description,
+      "montant": montant,
+      "image": image,
+      "devise": devise
+    }
+    storeNewEntry(entry);
+  }
+
+  const updateDevise = function (currency) {
     setDevise(currency)
   };
 
-  const updateDescription = function(desc){
+  const updateDescription = function (desc) {
     setDescription(desc)
   };
 
-  const updateMontant = function(montant){
-    setMontant(montant)
+  const updateMontant = function (montant) {
+    setMontant(montant);
   };
 
   useEffect(() => {
@@ -79,82 +115,90 @@ export default function componentName({ navigation: { goBack } }) {
 
   return (
     <KeyboardAvoidingView style={styles.main}>
-      <ScrollView style={{marginTop:25}}>
-      <View style={styles.containerTitle}>
-        <View style={styles.goBack}>
-          <TouchableWithoutFeedback onPress={() => goBack()}>
-            <Icons size={35} color={colors.LIGHT_PRIMARY} name="back"></Icons>
-          </TouchableWithoutFeedback>
-        </View>
-        <View style={styles.titleContainer}>
-          <Text numberOfLines={1} style={styles.title}>Nouvelle transaction</Text>
-        </View>
-        <View style={styles.goBack} />
-      </View>
-
-      <View style={styles.containerSolde}>
-        <Text style={styles.textSolde}>4594 CHF</Text>
-      </View>
-
-      {/* Container des input */}
-      <View style={styles.containerTransactions}>
-
-        {/* Input type de transaction */}
-        <ButtonGroup
-          onPress={(type) => updateType(type)}
-          selectedIndex={typeTransaction}
-          buttons={buttons}
-          buttonStyle={styles.buttonTypeStyle}
-          selectedButtonStyle={{ backgroundColor: colors.LIGHT_PRIMARY }}
-          innerBorderStyle={{ color: colors.LIGHT_PRIMARY }}
-          containerStyle={{ borderColor: colors.LIGHT_PRIMARY, borderRadius: 25, width: '100%', marginLeft: 0, marginBottom: 15 }}
-        />
-
-        {/* Input description */}
-        <TextInput style={styles.textAmount} onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
-
-        {/* Input container montant + devise */}
-        <View style={styles.containerAmountCurr}>
-          <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
-          <View style={styles.textAmountCurr}>
-            <Picker
-              selectedValue={devise}
-              style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
-              onValueChange={(itemValue, itemIndex) => updateDevise(itemValue)}
-            >
-              <Picker.Item label="CHF" value="CHF" />
-              <Picker.Item label="EUR" value="EUR" />
-            </Picker>
+      <ScrollView style={{ marginTop: 25 }}>
+        <View style={styles.containerTitle}>
+          <View style={styles.goBack}>
+            <TouchableWithoutFeedback onPress={() => goBack()}>
+              <Icons size={35} color={colors.LIGHT_PRIMARY} name="back"></Icons>
+            </TouchableWithoutFeedback>
           </View>
+          <View style={styles.titleContainer}>
+            <Text numberOfLines={1} style={styles.title}>Nouvelle transaction</Text>
+          </View>
+          <View style={styles.goBack} />
         </View>
 
-         {/* Input ticket a upload */}
-        <Button
-          icon={
-            <Icons
-              name={accepted ? "check" : "camera"}
-              size={35}
-              color={accepted ? colors.GREEN : "white"}
-            />
-          }
-          iconRight
-          type="outline"
-          onPress={pickImage}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonTitle}
-          containerStyle={{ width: '100%', marginLeft: 0 }}
-        />
-      </View>
-      <View style={styles.ContainerButtonAccept}>
-      <Button       
-                    onPress={()=>storeData()}
-                    title="Sauvegarder"
-                    type="outline"
-                    buttonStyle={styles.buttonSave}
-                    titleStyle={styles.buttonSaveTitle}
-                    containerStyle={{width: '100%',marginLeft:0}}
-                />
-      </View>
+        <View style={styles.containerSolde}>
+          <Text style={styles.textSolde}>4594 CHF</Text>
+        </View>
+
+        {/* Container des input */}
+        <View style={styles.containerTransactions}>
+
+          {/* Input type de transaction */}
+          <ButtonGroup
+            onPress={(type) => updateType(type)}
+            selectedIndex={typeTransaction}
+            buttons={buttons}
+            buttonStyle={styles.buttonTypeStyle}
+            selectedButtonStyle={{ backgroundColor: colors.LIGHT_PRIMARY }}
+            innerBorderStyle={{ color: colors.LIGHT_PRIMARY }}
+            containerStyle={{ borderColor: colors.LIGHT_PRIMARY, borderRadius: 25, width: '100%', marginLeft: 0, marginBottom: 15 }}
+          />
+
+          {/* Input description */}
+          <TextInput type="number" style={styles.textAmount} onC onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
+
+          {/* Input container montant + devise */}
+          <View style={styles.containerAmountCurr}>
+            <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
+            <View style={styles.textAmountCurr}>
+              <Picker
+                selectedValue={devise}
+                style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
+                onValueChange={(itemValue, itemIndex) => updateDevise(itemValue)}
+              >
+                <Picker.Item label="CHF" value="CHF" />
+                <Picker.Item label="EUR" value="EUR" />
+              </Picker>
+            </View>
+          </View>
+
+          <View style={styles.containerPrev}>
+            <Text style={styles.prevText}>{soldeActuel}</Text>
+            <Text style={[styles.prevTextType, {color:typeTransaction==1?colors.GREEN:colors.RED}]}>{typeTransaction == 1 ? "+" : "-"}</Text>
+            <Text style={[styles.prevText, {color:typeTransaction==1?colors.GREEN:colors.RED}]}>{montant}</Text>
+            <Text style={styles.prevTextRes}>= {newSolde}</Text>
+          </View>
+
+
+          {/* Input ticket a upload */}
+          <Button
+            icon={
+              <Icons
+                name={accepted ? "check" : "camera"}
+                size={35}
+                color={accepted ? colors.GREEN : "white"}
+              />
+            }
+            iconRight
+            type="outline"
+            onPress={pickImage}
+            buttonStyle={styles.button}
+            titleStyle={styles.buttonTitle}
+            containerStyle={{ width: '100%', marginLeft: 0 }}
+          />
+        </View>
+        <View style={styles.ContainerButtonAccept}>
+          <Button
+            onPress={() => storeData()}
+            title="Sauvegarder"
+            type="outline"
+            buttonStyle={styles.buttonSave}
+            titleStyle={styles.buttonSaveTitle}
+            containerStyle={{ width: '100%', marginLeft: 0 }}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -170,11 +214,29 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.CUS_WHITE
   },
+  prevText: {
+    fontSize: 18,
+    color: colors.CUS_WHITE,
+    flex: 4,
+    textAlign: 'center',
+  },
+  prevTextRes: {
+    fontSize: 18,
+    color: colors.CUS_WHITE,
+    flex: 5,
+    textAlign: 'center',
+  },
+  prevTextType: {
+    fontSize: 18,
+    color: colors.CUS_WHITE,
+    flex: 1,
+    textAlign: 'center'
+  },
   containerSolde: {
     flex: 1,
     marginHorizontal: 15,
     alignItems: 'center',
-    paddingVertical:25
+    paddingVertical: 25
   },
   containerTitle: {
     flex: 1,
@@ -196,7 +258,7 @@ const styles = StyleSheet.create({
 
   ContainerButtonAccept: {
     flex: 2,
-    justifyContent:"flex-end",
+    justifyContent: "flex-end",
     marginHorizontal: 15,
     paddingBottom: 15,
   },
@@ -277,6 +339,17 @@ const styles = StyleSheet.create({
     borderColor: colors.LIGHT_PRIMARY,
     backgroundColor: colors.LIGHT_PRIMARY
   },
+  transactionIndication: {
+    fontSize: 18,
+    borderRadius: 25,
+    color: colors.LIGHT_WHITE,
+    borderWidth: 1,
+    flex: 1,
+    height: 40,
+    borderColor: colors.DARK_PRIMARY,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   button: {
     borderColor: colors.LIGHT_PRIMARY,
     borderRadius: 25,
@@ -306,5 +379,9 @@ const styles = StyleSheet.create({
   containerAmountCurr: {
     flexDirection: 'row',
     marginBottom: 15
+  },
+  containerPrev: {
+    height: 40,
+    flexDirection: 'row'
   }
 });

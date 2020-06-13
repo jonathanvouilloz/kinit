@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, Button } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import TransactionListItem from '../components/transactionListItem'
+import { useSelector } from 'react-redux'
 
 
 const DATA = [
@@ -36,13 +37,21 @@ const DATA = [
 
 export default function Home({navigation}) {
 
+  const camps = useSelector(state => state);
+
+  //premier lancement -> chargement plus ajout dans redux camp actif
+
+  const flatListRender = ({item}) => (
+    <TransactionListItem title={item.title} goToNewTransaction={(title) => navigation.navigate('Details', {item: item})} />
+  )
+ 
   return (
     <View style={styles.main}>
       <View style={styles.containerTitle}>
-        <Text style={styles.title}>Diablerets Sensations</Text>
+        <Text style={styles.title}>{camps[0] ? camps[0].camp.name : "Aucun camp actif"}</Text>
       </View>
       <View style={styles.containerSolde}>
-            <Text style={styles.textSolde}>4594 CHF</Text>
+            <Text style={styles.textSolde}>{camps[0] ? camps[0].camp.solde : "-"} CHF</Text>
       </View>
       <View style={styles.containerAddTransactions}>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('AddTransaction')}>
@@ -52,7 +61,7 @@ export default function Home({navigation}) {
       <View style={styles.containerTransactions}>
           <FlatList
               data={DATA}
-              renderItem={({ item }) => <TransactionListItem title={item.title} goToNewTransaction={(title) => navigation.navigate('Details', {item: item})} />}
+              renderItem={flatListRender}
               keyExtractor={item => item.id}
            />
       </View>
