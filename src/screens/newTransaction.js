@@ -3,14 +3,15 @@ import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, Picker, Im
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
-import { Button, ButtonGroup } from 'react-native-elements';
+import { Button, ButtonGroup, Overlay } from 'react-native-elements';
 import Constants from 'expo-constants';
 import storeNewEntry from "../services/storeNewTransaction"
+import CheckBox from '@react-native-community/checkbox'
+
 
 
 let débit = () => <Icons size={25} color={colors.CUS_WHITE} name="minus"></Icons>
 let crédit = () => <Icons size={25} color={colors.CUS_WHITE} name="plus"></Icons>
-let gelé = () => <Icons size={20} color={colors.CUS_WHITE} name="reload1"></Icons>
 
 
 export default function componentName({ navigation: { goBack } }) {
@@ -24,10 +25,13 @@ export default function componentName({ navigation: { goBack } }) {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("null");
   const [devise, setDevise] = useState("CHF");
+  const [caution, setCaution] = useState(false);
   //utilitaire
   const [accepted, setAccepted] = useState(false);
+  const [isModalValiation, setValidVisible] = useState(false);
 
-  const buttons = [{ element: débit }, { element: crédit }, { element: gelé }]
+
+  const buttons = [{ element: débit }, { element: crédit }]
 
 
   useEffect(() => {
@@ -45,7 +49,14 @@ export default function componentName({ navigation: { goBack } }) {
 
   const updateType = function (type) {
     setTransaction(type);
-  }
+    if (type === 1) {
+      setCaution(false);
+    }
+  };
+
+  const toggleOverlay = () => {
+    setValidVisible(!isModalValiation);
+  };
 
   const calcNewSolde = function (typeTransa, montantA) {
     let newSoldeV = soldeActuel;
@@ -87,6 +98,13 @@ export default function componentName({ navigation: { goBack } }) {
   const updateMontant = function (montant) {
     setMontant(montant);
   };
+
+  const updateCaution = function (val) {
+    setCaution(val);
+    if (val) {
+      setTransaction(0);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -143,8 +161,20 @@ export default function componentName({ navigation: { goBack } }) {
             buttonStyle={styles.buttonTypeStyle}
             selectedButtonStyle={{ backgroundColor: colors.LIGHT_PRIMARY }}
             innerBorderStyle={{ color: colors.LIGHT_PRIMARY }}
-            containerStyle={{ borderColor: colors.LIGHT_PRIMARY, borderRadius: 25, width: '100%', marginLeft: 0, marginBottom: 15 }}
+            containerStyle={{ borderColor: colors.LIGHT_PRIMARY, borderRadius: 25, width: '100%', marginLeft: 0 }}
           />
+          <View style={styles.cautionContainer}>
+            <CheckBox
+              value={caution}
+              tintColors={{ true: colors.GREEN, false: colors.CUS_WHITE }}
+              tintColor={colors.CUS_WHITE}
+              onCheckColor={colors.GREEN}
+              onValueChange={(val) => updateCaution(val)}
+            />
+            <Text style={styles.cautionText}>Argent gelé / Caution</Text>
+
+          </View>
+
 
           {/* Input description */}
           <TextInput type="number" style={styles.textAmount} onC onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
@@ -166,8 +196,8 @@ export default function componentName({ navigation: { goBack } }) {
 
           <View style={styles.containerPrev}>
             <Text style={styles.prevText}>{soldeActuel}</Text>
-            <Text style={[styles.prevTextType, {color:typeTransaction==1?colors.GREEN:colors.RED}]}>{typeTransaction == 1 ? "+" : "-"}</Text>
-            <Text style={[styles.prevText, {color:typeTransaction==1?colors.GREEN:colors.RED}]}>{montant}</Text>
+            <Text style={[styles.prevTextType, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{typeTransaction == 1 ? "+" : "-"}</Text>
+            <Text style={[styles.prevText, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{montant}</Text>
             <Text style={styles.prevTextRes}>= {newSolde}</Text>
           </View>
 
@@ -191,7 +221,7 @@ export default function componentName({ navigation: { goBack } }) {
         </View>
         <View style={styles.ContainerButtonAccept}>
           <Button
-            onPress={() => storeData()}
+            onPress={toggleOverlay}
             title="Sauvegarder"
             type="outline"
             buttonStyle={styles.buttonSave}
@@ -199,6 +229,28 @@ export default function componentName({ navigation: { goBack } }) {
             containerStyle={{ width: '100%', marginLeft: 0 }}
           />
         </View>
+        <Overlay overlayStyle={{borderRadius:15}}  isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
+          <View style={{ width: 275, height: 100, justifyContent:'center' }}>
+            <Text style={{textAlign:'center',fontSize:20, paddingBottom:15}}>Confimer la transaction</Text>
+            <View style={{flexDirection:'row',marginLeft:15}}>
+            <Button
+            title="Oui"
+            type="outline"
+            buttonStyle={styles.buttonOverlay}
+            titleStyle={styles.buttonSaveTitle}
+            containerStyle={{ flex:1 }}
+          />
+          <Button
+            title="Non"
+            type="outline"
+            buttonStyle={styles.buttonOverlay}
+            titleStyle={styles.buttonSaveTitle}
+            containerStyle={{  flex:1  }}
+          />
+            </View>
+           
+          </View>
+        </Overlay>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -362,6 +414,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.DARK_PRIMARY,
     height: 45
   },
+  buttonOverlay: {
+    borderColor: colors.GREEN,
+    height: 40,
+    width:115,
+  },
   buttonSaveTitle: {
     color: colors.GREEN,
   },
@@ -383,5 +440,16 @@ const styles = StyleSheet.create({
   containerPrev: {
     height: 40,
     flexDirection: 'row'
+  },
+  cautionContainer: {
+    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5
+  },
+  cautionText: {
+    fontSize: 16,
+    color: colors.CUS_WHITE,
+    marginLeft: 5
   }
 });

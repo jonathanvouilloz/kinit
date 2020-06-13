@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Picker, ScrollView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import colors from '../static/color'
 import { Divider } from 'react-native-elements';
+import {Picker} from '@react-native-community/picker';
 
 
 export default function Help({ navigation }) {
@@ -18,9 +19,11 @@ export default function Help({ navigation }) {
       </View>
       <View style={styles.containerChoice}>
         <View style={{ borderRadius: 25, overflow: 'hidden'}}>
+ 
           <Picker
+
             selectedValue={selectedValue}
-            style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
+            style={{ height: 40, backgroundColor:colors.LIGHT_PRIMARY }}
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
           >
             <Picker.Item label="Centre Protestant de Vacances" value="CPV" />
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
   },
   containerChoice: {
     flex: 1,
-    paddingHorizontal:25 
+    paddingHorizontal:15 
   },
   containerInfos: {
     flex: 3,

@@ -4,7 +4,8 @@ const colors = {
     GREEN: "#67EBA9",
     RED: "#FF4141",
     CUS_WHITE: "#DCDBDB",
-    LIGHT_WHITE:"#FEFEFE"
+    LIGHT_WHITE:"#FEFEFE",
+    ORANGE: "#FF8300"
 }
 
 export default colors;

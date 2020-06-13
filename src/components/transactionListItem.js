@@ -8,16 +8,19 @@ export default function transactionItem({title, goToNewTransaction}) {
   return (
     <View style={styles.main}>
         <View style={styles.leftContainer}>
+        <View style={styles.titleContainer2}>
+                <Text style={styles.dateText}>10.05.2020</Text>
+            </View>
             <View style={styles.titleContainer}>
-                <Text style={styles.titleText}>course lundi migros</Text>
+                <Text numberOfLines={1} style={styles.titleText}>course lundi migros</Text>
             </View>
             <View style={styles.amountContainer}>
-                <Text style={styles.amountText}>+ 45.94 CHF</Text>
+                <Text style={styles.amountText}>~ 45.94 CHF</Text>
             </View>
         </View>
         <View style={styles.rightContainer}>
             <TouchableWithoutFeedback onPress={() => goToNewTransaction(title)}>
-                            <Icons name="dots-three-vertical" color={colors.CUS_WHITE} size={30}></Icons>
+                            <Icons name="dots-three-vertical" color={colors.CUS_WHITE} size={35}></Icons>
             </TouchableWithoutFeedback>
         </View>
      </View>
@@ -27,10 +30,10 @@ export default function transactionItem({title, goToNewTransaction}) {
 
 const styles = StyleSheet.create({
     main:{
-        borderRadius:15,
+        borderRadius:25,
         backgroundColor:colors.LIGHT_PRIMARY,
-        marginBottom:5,
-        height:80,
+        marginBottom:8,
+        height:100,
         flexDirection:'row'
     },
     leftContainer:{
@@ -43,8 +46,14 @@ const styles = StyleSheet.create({
     },
     titleContainer:{
         flex:2,
+        justifyContent:'center',
+        paddingLeft:15,
+    },
+    titleContainer2:{
+        flex:1,
         justifyContent:'flex-end',
-        paddingLeft:15
+        paddingLeft:15,
+        paddingTop:10
     },
     amountContainer:{
         flex:3,
@@ -56,7 +65,11 @@ const styles = StyleSheet.create({
         color:colors.GREEN
     },
     titleText:{
-        fontSize:15,
+        fontSize:16,
+        color:colors.LIGHT_WHITE
+    },
+    dateText:{
+        fontSize:12,
         color:colors.CUS_WHITE
     }
   });

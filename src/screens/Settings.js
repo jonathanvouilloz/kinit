@@ -67,14 +67,6 @@ export default function Settings({ navigation }) {
             titleStyle={styles.buttonGenTitle}
           />
         </View>
-        <View style={styles.containerGenInput4}>
-          <Button
-            title="Envoyer à l'association"
-            type="outline"
-            buttonStyle={styles.buttonGen}
-            titleStyle={styles.buttonGenTitle}
-          />
-        </View>
         <View style={{ alignItems: 'center' }}>
           <Divider style={{ backgroundColor: colors.CUS_WHITE, marginBottom: 30, width: "50%" }} />
         </View>
@@ -100,7 +92,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   containerParam: {
-    height: 250,
+    height: 275,
+  },
+  containerGenTitle: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   containerGenTitle: {
     flex: 2,
@@ -112,7 +109,7 @@ const styles = StyleSheet.create({
   },
   containerGenInput3: {
     height: 50,
-    marginBottom: 5
+    marginBottom: 30
   },
   containerGenInput4: {
     height: 50,
@@ -122,7 +119,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   containerRecap: {
-    height: 300,
+    height: 250,
   },
   containerReset: {
     height: 200,

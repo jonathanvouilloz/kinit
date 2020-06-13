@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Picker, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Picker, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
@@ -10,17 +10,20 @@ export default function componentName({ navigation: { goBack }, route }) {
     const [selectedValue, setSelectedValue] = useState("CHF");
     const { item } = route.params;
     return (
-        <View style={styles.main}>
+        <ScrollView style={styles.main}>
             <View style={styles.containerTitle}>
                 <View style={styles.goBack}>
-                    <TouchableWithoutFeedback onPress={()=> goBack()}>
+                    <TouchableWithoutFeedback onPress={() => goBack()}>
                         <Icons size={35} color={colors.LIGHT_PRIMARY} name="back"></Icons>
                     </TouchableWithoutFeedback>
                 </View>
                 <View style={styles.titleContainer}>
-                    <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
+                    <Text style={styles.title}>Détails</Text>
                 </View>
                 <View style={styles.goBack} />
+            </View>
+            <View style={styles.descrContainer}> 
+                <Text style={styles.description}>{item.title}</Text>
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
@@ -53,10 +56,17 @@ export default function componentName({ navigation: { goBack }, route }) {
                     type="outline"
                     buttonStyle={styles.button}
                     titleStyle={styles.buttonTitle}
-                    containerStyle={{width: '100%',marginLeft:0}}
-                />            
-                </View>
-        </View>
+                    containerStyle={{ width: '100%', marginLeft: 0, marginBottom:10 }}
+                />
+                <Button
+                    title="Transaction récupérée"
+                    type="outline"
+                    buttonStyle={styles.buttonV2}
+                    titleStyle={styles.buttonTitleV2}
+                    containerStyle={{ width: '100%', marginLeft: 0 }}
+                />
+            </View>
+        </ScrollView>
     );
 }
 
@@ -70,20 +80,24 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: colors.CUS_WHITE
     },
+    description: {
+        fontSize: 16,
+        color: colors.CUS_WHITE,
+    },
     containerTitle: {
-        flex: 1,
+        height: 100,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
         marginHorizontal: 15
     },
     saveContainer: {
-        flex: 1,
+        height: 150,
         marginHorizontal: 15,
-        justifyContent:'center'
+        justifyContent: 'center'
     },
     containerTransactions: {
-        flex: 5,
+        height:250,
         marginHorizontal: 15,
         paddingTop: 15,
         backgroundColor: 'yellow'
@@ -94,7 +108,7 @@ const styles = StyleSheet.create({
         color: colors.GREEN
     },
     containerDetails: {
-        flex: 1,
+        height:100,
         marginHorizontal: 15,
         alignItems: 'center',
         justifyContent: 'center',
@@ -106,6 +120,10 @@ const styles = StyleSheet.create({
     titleContainer: {
         flex: 3,
         alignItems: 'center'
+    },
+    descrContainer: {
+        flex: 3,
+        marginHorizontal:15
     },
     updateTransa: {
         flex: 1,
@@ -131,11 +149,18 @@ const styles = StyleSheet.create({
         borderColor: colors.LIGHT_PRIMARY,
         backgroundColor: colors.LIGHT_PRIMARY
     },
-    button:{
-        borderColor:colors.GREEN,
-        borderRadius:25
+    button: {
+        borderColor: colors.GREEN,
+        borderRadius: 25
     },
-    buttonTitle:{
-        color:colors.GREEN
+    buttonTitle: {
+        color: colors.GREEN
+    },
+    buttonV2: {
+        borderColor: colors.ORANGE,
+        borderRadius: 25
+    },
+    buttonTitleV2: {
+        color: colors.ORANGE
     }
 });
