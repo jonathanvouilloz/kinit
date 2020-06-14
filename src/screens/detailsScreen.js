@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Picker, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
+import {Picker} from '@react-native-community/picker'
 
 
 
@@ -23,14 +24,14 @@ export default function componentName({ navigation: { goBack }, route }) {
                 <View style={styles.goBack} />
             </View>
             <View style={styles.descrContainer}> 
-                <Text style={styles.description}>{item.title}</Text>
+                <Text style={styles.description}>{item.name}</Text>
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
                     <Text style={styles.textTypeTransa}>Crédit de:</Text>
                 </View>
                 <View style={styles.amountTransa}>
-                    <TextInput keyboardType="number-pad" style={styles.textAmount}>4530</TextInput>
+                    <TextInput value={item.solde} keyboardType="number-pad" style={styles.textAmount}></TextInput>
                 </View>
                 <View style={styles.updateTransa}>
                     <View style={{ borderRadius: 25, overflow: 'hidden' }}>

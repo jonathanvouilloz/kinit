@@ -38,20 +38,36 @@ const DATA = [
 export default function Home({navigation}) {
 
   const camps = useSelector(state => state);
+  let array = []
 
-  //premier lancement -> chargement plus ajout dans redux camp actif
+  function iterateOverData(data) {
+    for(let key in data) {
+      array.push({id: key, name: data[key].name, solde:data[key].solde})
+    }
+  }
+
+  console.log(camps.transactions);
+  if(camps.transactions === undefined){
+    console.log("vide");
+    
+  }else{
+    const {transactions} = camps;
+      iterateOverData(transactions); 
+    };
+  
+   //premier lancement -> chargement bdd plus ajout dans redux camp actif
 
   const flatListRender = ({item}) => (
-    <TransactionListItem title={item.title} goToNewTransaction={(title) => navigation.navigate('Details', {item: item})} />
+    <TransactionListItem transa={item} goToNewTransaction={(title) => navigation.navigate('Details', {item: item})} />
   )
  
   return (
     <View style={styles.main}>
       <View style={styles.containerTitle}>
-        <Text style={styles.title}>{camps[0] ? camps[0].camp.name : "Aucun camp actif"}</Text>
+        <Text style={styles.title}>{camps.camp ? camps.camp.name : "Aucun camp actif"}</Text>
       </View>
       <View style={styles.containerSolde}>
-            <Text style={styles.textSolde}>{camps[0] ? camps[0].camp.solde : "-"} CHF</Text>
+            <Text style={styles.textSolde}> "-"CHF</Text>
       </View>
       <View style={styles.containerAddTransactions}>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('AddTransaction')}>
@@ -59,10 +75,16 @@ export default function Home({navigation}) {
             </TouchableWithoutFeedback>
       </View>
       <View style={styles.containerTransactions}>
+         
           <FlatList
-              data={DATA}
+              data={array === null ? DATA : array}
               renderItem={flatListRender}
               keyExtractor={item => item.id}
+              ListEmptyComponent={
+                <View style={styles.emptyList}>
+                  <Text style={styles.textEmptyList}>Aucune transaction effectuée</Text>
+                </View>
+              }
            />
       </View>
     </View>
@@ -103,5 +125,14 @@ const styles = StyleSheet.create({
     marginHorizontal:25,
     alignItems:'center',
     justifyContent:'center'
+  },
+  emptyList:{
+    height:100,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  textEmptyList:{
+    fontSize:20,
+    color:colors.CUS_WHITE
   }
 });

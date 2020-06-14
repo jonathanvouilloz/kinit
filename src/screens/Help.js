@@ -23,7 +23,7 @@ export default function Help({ navigation }) {
           <Picker
 
             selectedValue={selectedValue}
-            style={{ height: 40, backgroundColor:colors.LIGHT_PRIMARY }}
+            style={{ height: 40, backgroundColor:colors.LIGHT_PRIMARY, color:colors.CUS_WHITE }}
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
           >
             <Picker.Item label="Centre Protestant de Vacances" value="CPV" />

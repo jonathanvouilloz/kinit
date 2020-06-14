@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
 import colors from '../static/color'
 import { Button, Divider } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
-import { addcamp } from '../redux/campsApp'
+import { addcamp, addtransa } from '../redux/campsApp'
 
 
 
@@ -12,17 +12,20 @@ export default function Settings({ navigation }) {
   const [name, setName] = useState(null);
   const [amount, setAmount] = useState(null);
 
-  const camps = useSelector(state => state)
   const dispatch = useDispatch()
-  const addCamp = note => dispatch(addcamp(note))
+  const addCamp = camp => dispatch(addcamp(camp))
+  const addTransa = transa => dispatch(addtransa(transa))
+
 
   const storeCampInfos = function(){
-    const camp ={name:name, solde:amount};
+    const camp = { name:name, solde:amount };
     addCamp(camp);
   }
 
 
   const nouveauCamp = async () => {
+    const transa = { name:"transa", solde:"12" };
+    addTransa(transa);
   }
 
   const updateName = function (val) {

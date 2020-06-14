@@ -4,7 +4,7 @@ import remove from 'lodash.remove'
 
 // Action Types
 export const ADD_CAMP = 'ADD_CAMP'
-export const DEL_CAMP = 'DEL_CAMP'
+export const ADD_TRANSA = 'ADD_TRANSA'
 
 
 // Action Creators
@@ -14,38 +14,40 @@ let campID = 0
 export function addcamp(camp) {
   return {
     type: ADD_CAMP,
-    id: campID++,
     camp
   }
 }
 
-export function delcamp(id) {
+export function addtransa(transa) {
   return {
-    type: DEL_CAMP,
-    payload: id
+    type: ADD_TRANSA,
+    transa,
+    id: transa.name+campID++
   }
 }
 
 // reducer
 
-const initialState = []
+const initialState = {}
 
 function campsReducer(state = initialState, action) {
+  console.log("___");
   switch (action.type) {
     case ADD_CAMP:
-      return [
-        ...state,
-        {
-          id: action.id,
-          camp: action.camp
-        }
-      ]
+      return {
+            name: action.camp.name,
+            solde: action.camp.solde,
+      }
 
-    case DEL_CAMP:
-      const deletedNewArray = remove(state, obj => {
-        return obj.id != action.payload
-      })
-      return deletedNewArray
+    case ADD_TRANSA:
+      return {
+        ...state,
+        transactions:{
+          ...state.transactions,
+          [action.id]: action.transa,
+        }   
+      }
+
 
     default:
       return state

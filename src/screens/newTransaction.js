@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, Picker, Image, KeyboardAvoidingView, ScrollView, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView } from 'react-native';
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
@@ -7,6 +7,7 @@ import { Button, ButtonGroup, Overlay } from 'react-native-elements';
 import Constants from 'expo-constants';
 import storeNewEntry from "../services/storeNewTransaction"
 import CheckBox from '@react-native-community/checkbox'
+import {Picker} from '@react-native-community/picker';
 
 
 
@@ -24,7 +25,7 @@ export default function componentName({ navigation: { goBack } }) {
   const [montant, setMontant] = useState(0);
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("null");
-  const [devise, setDevise] = useState("CHF");
+  const [devise, setDevise] = useState(0);
   const [caution, setCaution] = useState(false);
   //utilitaire
   const [accepted, setAccepted] = useState(false);
@@ -182,14 +183,14 @@ export default function componentName({ navigation: { goBack } }) {
           {/* Input container montant + devise */}
           <View style={styles.containerAmountCurr}>
             <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
-            <View style={styles.textAmountCurr}>
+            <View style={styles.textAmountCurr}>   
               <Picker
                 selectedValue={devise}
                 style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
                 onValueChange={(itemValue, itemIndex) => updateDevise(itemValue)}
               >
-                <Picker.Item label="CHF" value="CHF" />
-                <Picker.Item label="EUR" value="EUR" />
+                <Picker.Item label="CHF" value={0} />
+                <Picker.Item label="EUR" value={1} />
               </Picker>
             </View>
           </View>
