@@ -56,7 +56,7 @@ export const insertCamp = async function (camp) {
         (tx, results) => {
           db.transaction(function (tx) {
             tx.executeSql('select * from camp where id = 1', [],
-              (tx, results) => {
+              (tx, results) => {           
                 resolve(results);
               }
             )
@@ -79,7 +79,7 @@ export const insertTransaction = async function (transa) {
   const db = SQLite.openDatabase('campsDB');
   let campUpdated;
   //montant a operér
-  const montantTransaction = parseFloat(transa.montant);
+  const montantTransaction = parseFloat(transa.montant).toFixed(2);
 
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
@@ -99,7 +99,7 @@ export const insertTransaction = async function (transa) {
                     newSolde = soldeActuel - montantTransaction;
                     break;
                   case 1:
-                    newSolde = soldeActuel + montantTransaction;
+                    newSolde = soldeActuel + montantTransaction/1;
                     break;
                   default:
                     newSolde = soldeActuel - montantTransaction;
@@ -107,7 +107,7 @@ export const insertTransaction = async function (transa) {
                 }
                 //update le solde du camp
                 db.transaction(function (tx) {
-                  tx.executeSql("update camp set solde = ? where id = ?", [newSolde, transa.idCamp],
+                  tx.executeSql("update camp set solde = ? where id = ?", [parseFloat(newSolde).toFixed(2), transa.idCamp],
                   (tx) => {
                     db.transaction(function (tx) {
                       tx.executeSql('select * from transactions where camp_id = ? order by id desc', [transa.idCamp],

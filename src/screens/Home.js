@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, ToastAndroid } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import TransactionListItem from '../components/transactionListItem'
@@ -28,7 +28,7 @@ export default function Home({ navigation }) {
     const transactions = await selectTransactions();
     
     if (camps) {
-      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde };
+      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial };
       addCamp(campRedux);
     }else{
       console.log("pas de camp");  
@@ -37,6 +37,20 @@ export default function Home({ navigation }) {
       addAllTransa(transactions)
     }
   }
+
+  const goToAddNewTransactions = function(){
+    if (!campsRedux.camp.name) {
+      ToastAndroid.showWithGravityAndOffset(
+        "Veuillez ajouter un camp avant d'ajouter une transaction",
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        0,
+        50
+      );
+    }else{
+      navigation.navigate('AddTransaction')
+    }
+  };
 
 
   return (
@@ -49,14 +63,14 @@ export default function Home({ navigation }) {
         <Text style={styles.textCaution}>(fonctionnalité à venir)</Text>
       </View>
       <View style={styles.containerAddTransactions}>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('AddTransaction')}>
+        <TouchableWithoutFeedback onPress={()=>goToAddNewTransactions()}>
           <Icons size={55} color={colors.LIGHT_PRIMARY} name="pluscircle" />
         </TouchableWithoutFeedback>
       </View>
       <View style={styles.containerTransactions}>
         <FlatList
           data={campsRedux.transactions}
-          renderItem={({ item }) => <TransactionListItem transa={item} goToNewTransaction={() => navigation.navigate('Details', { item: item })} />}
+          renderItem={({ item }) => <TransactionListItem transa={item} goToDetails={() => navigation.navigate('Details', { item: item })} />}
 
           keyExtractor={item => item.id.toString()}
           ListEmptyComponent={

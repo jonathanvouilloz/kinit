@@ -4,7 +4,7 @@ import colors from '../static/color'
 import Icons from 'react-native-vector-icons/Entypo';
 
 
-export default function transactionItem({transa, goToNewTransaction}) {    
+export default function transactionItem({transa, goToDetails}) {    
     const {date, currency, typeTransaction, montant, name} = transa;
     const dateFormat = new Date(date).toLocaleDateString();
     
@@ -27,7 +27,7 @@ export default function transactionItem({transa, goToNewTransaction}) {
             </View>
         </View>
         <View style={styles.rightContainer}>
-            <TouchableWithoutFeedback onPress={() => goToNewTransaction()}>
+            <TouchableWithoutFeedback onPress={() => goToDetails()}>
                             <Icons name="dots-three-vertical" color={colors.CUS_WHITE} size={35}></Icons>
             </TouchableWithoutFeedback>
         </View>

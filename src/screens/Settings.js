@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
 import colors from '../static/color'
 import { Button, Divider } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
-import { addcamp, addtransa } from '../redux/campsApp'
+import { addcamp, reset } from '../redux/campsApp'
 import * as query from "../services/storeNewTransaction"
 
 
@@ -15,8 +15,11 @@ export default function Settings({ navigation }) {
   const dispatch = useDispatch()
   const campsRedux = useSelector(state => state);
   const addCamp = camp => dispatch(addcamp(camp))
+  const resetAll = () => dispatch(reset())
 
 
+  console.log(campsRedux.camp);
+  
   const storeCampInfos = async function () {
     const campSql = { name: name, solde: amount };
     //insert sql, on attends -> insertion redux 
@@ -26,13 +29,12 @@ export default function Settings({ navigation }) {
   }
 
   const downloadResume = async function () {
-
-
-
+      //todo
   };
 
   const nouveauCamp = async () => {
-    //drop all and create
+    //drop all and create + vider store
+    resetAll();
     query.createTable();
   }
 
@@ -65,6 +67,7 @@ export default function Settings({ navigation }) {
         </View>
         <View style={styles.containerGenInput2}>
           <Button
+            disabled={campsRedux.camp.soldeInitial ? true : false}
             title="Sauvegarder"
             type="outline"
             buttonStyle={styles.buttonGen}

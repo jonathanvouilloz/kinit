@@ -3,7 +3,7 @@ export const ADD_CAMP = 'ADD_CAMP'
 export const ADD_TRANSA = 'ADD_TRANSA'
 export const ADD_ALL_TRANSA = 'ADD_ALL_TRANSA'
 export const ADD_TRANSA_FIRST = 'ADD_TRANSA_FIRST'
-
+export const RESET = 'RESET'
 // Action Creators
 
 export function addcamp(camp) {
@@ -34,6 +34,12 @@ export function addtransafirst(transa) {
   }
 }
 
+export function reset() {
+  return {
+    type: RESET,
+  }
+}
+
 // reducer
 
 const initialState = {camp:{}, transactions:[]}
@@ -46,7 +52,7 @@ function campsReducer(state = initialState, action) {
           id: action.camp.id,
           name: action.camp.name,
           solde: action.camp.solde,
-          ...state
+          soldeInitial: action.camp.soldeInitial,
         },
         transactions: [...state.transactions]
       }
@@ -68,6 +74,10 @@ function campsReducer(state = initialState, action) {
         ...state,
         transactions: action.allTransa,
       }
+
+      case RESET:
+      return {camp:{}, transactions:[]}
+
     default:
       return state
   }

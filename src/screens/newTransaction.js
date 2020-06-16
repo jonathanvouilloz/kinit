@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView, Image, ToastAndroid } from 'react-native';
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
@@ -8,9 +8,9 @@ import Constants from 'expo-constants';
 import CheckBox from '@react-native-community/checkbox'
 import { Picker } from '@react-native-community/picker';
 import * as ImageManipulator from 'expo-image-manipulator';
-import {insertTransaction} from "../services/storeNewTransaction"
+import { insertTransaction } from "../services/storeNewTransaction"
 import { addtransa, addtransafirst, addcamp } from '../redux/campsApp'
-import {useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 
 
@@ -22,8 +22,7 @@ export default function componentName({ navigation: { goBack } }) {
 
   //data pour nouvelle entry
   //0 = débit, 1 = crédit
-  const [newSolde, setNewSolde] = useState(4594);
-  const [soldeActuel, setSolde] = useState(4594);
+  const [newSolde, setNewSolde] = useState(0);
   const [typeTransaction, setTransaction] = useState(0);
   const [montant, setMontant] = useState(0);
   const [description, setDescription] = useState("");
@@ -33,6 +32,7 @@ export default function componentName({ navigation: { goBack } }) {
   //utilitaire
   const [accepted, setAccepted] = useState(false);
   const [isModalValiation, setValidVisible] = useState(false);
+  const [transactionValid, setTransactionValid] = useState(false);
 
 
   const buttons = [{ element: débit }, { element: crédit }]
@@ -47,52 +47,86 @@ export default function componentName({ navigation: { goBack } }) {
 
   useEffect(() => {
     const newSolde = calcNewSolde(typeTransaction, montant);
-    setNewSolde(newSolde);
   }, [typeTransaction])
 
   useEffect(() => {
     const newSolde = calcNewSolde(typeTransaction, montant);
-    setNewSolde(newSolde);
   }, [montant])
 
-
-  const updateType = function (type) {    
+  const updateType = function (type) {
     setTransaction(type);
     if (type === 1) {
       setCaution(false);
     }
   };
 
-  const toggleOverlay = () => {
+  const toggleOverlay =  async () => {
     setValidVisible(!isModalValiation);
   };
 
   const calcNewSolde = function (typeTransa, montantA) {
-    let newSoldeV = soldeActuel;
+    let newSoldeC = newSolde;
     switch (typeTransa) {
       case 0:
-        newSoldeV = soldeActuel - montantA;
+        setNewSolde(campsRedux.camp.solde - montantA)
         break;
       case 1:
-        newSoldeV = soldeActuel + montantA / 1;
+        setNewSolde(campsRedux.camp.solde + montantA/1)
         break;
       default:
-        newSoldeV = soldeActuel - montantA;
+        setNewSolde(campsRedux.camp.solde - montantA)
         break;
     }
-
-    return newSoldeV;
   }
 
   const storeData = async function () {
+
+    if (montant <= 0 || montant === null || montant === undefined) {
+      setValidVisible(!isModalValiation);
+      ToastAndroid.showWithGravityAndOffset(
+        'Merci de remplir le montant de la transaction',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        0,
+        50
+      );
+      return
+    }
+
+    if (description === "" || description === null || description === undefined) {
+      setValidVisible(!isModalValiation);
+      ToastAndroid.showWithGravityAndOffset(
+        'Merci de remplir une description',
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        50
+      );
+      return
+    }
+
+
+    /*
+    if (image === "null") {
+      setValidVisible(!isModalValiation);
+      ToastAndroid.showWithGravityAndOffset(
+        "Merci d'attacher une image à cette transaction",
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        50
+      );
+      return
+    }*/
+
     let type;
-    if(typeTransaction === 0 && caution){
-      type=2;
-    }else if (typeTransaction === 0){
-      type=0;
-      
-    }else{
-      type=1;
+    if (typeTransaction === 0 && caution) {
+      type = 2;
+    } else if (typeTransaction === 0) {
+      type = 0;
+
+    } else {
+      type = 1;
     }
     const transa = {
       typeTransaction: type,
@@ -100,33 +134,34 @@ export default function componentName({ navigation: { goBack } }) {
       montant: montant,
       image: image,
       currency: devise,
-      idCamp : 1,
+      idCamp: 1,
     }
     //insert transactions
     const lastInsert = await insertTransaction(transa);
     //add derniere transa dans le store 
     const insertTransaRedux = {
-      id : lastInsert.results.id,
-      currency :lastInsert.results.currency,
+      id: lastInsert.results.id,
+      currency: lastInsert.results.currency,
       name: lastInsert.results.name,
-      typeTransaction : lastInsert.results.typeTransaction,
-      montant :lastInsert.results.montant,
-      image : lastInsert.results.image,
-      date : lastInsert.results.date
-    }   
-    if(lastInsert.first){
-      console.log("first time");
-      
-      addTransaFirst(insertTransaRedux);
-    } else{
-      addTransa(insertTransaRedux);
+      typeTransaction: lastInsert.results.typeTransaction,
+      montant: lastInsert.results.montant,
+      image: lastInsert.results.image,
+      date: lastInsert.results.date
     }
     
-  
+    if (lastInsert.first) {
+      addTransaFirst(insertTransaRedux);
+    } else {
+      addTransa(insertTransaRedux);
+    }
+
+
     const campUpdated = {
-      name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: lastInsert.camp.solde
+      id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial
     }
     addCamp(campUpdated);
+
+    setTransactionValid(!transactionValid);
 
   }
 
@@ -149,6 +184,15 @@ export default function componentName({ navigation: { goBack } }) {
     }
   }
 
+  const endOfContinue = function(){
+      toggleOverlay();
+      setTransactionValid(!transactionValid);
+  }
+  const endOfGoBack = async function(){
+      await toggleOverlay();
+      goBack();
+  }
+
   useEffect(() => {
     (async () => {
       if (Constants.platform.ios) {
@@ -166,15 +210,17 @@ export default function componentName({ navigation: { goBack } }) {
       allowsEditing: true,
       quality: 0.3,
       base64: true,
-    });
+    },);
 
     if (!result.cancelled) {
       setImage(result.uri);
       setAccepted(true);
+      _resizeImage(result.uri);
+    }else{
+      setImage("null");
+      setAccepted(false);
+
     }
-
-
-    _resizeImage(result.uri);
 
   };
 
@@ -207,7 +253,7 @@ export default function componentName({ navigation: { goBack } }) {
         </View>
 
         <View style={styles.containerSolde}>
-          <Text style={styles.textSolde}>4594 CHF</Text>
+          <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde : "-"} CHF</Text>
         </View>
 
         {/* Container des input */}
@@ -255,7 +301,7 @@ export default function componentName({ navigation: { goBack } }) {
           </View>
 
           <View style={styles.containerPrev}>
-            <Text style={styles.prevText}>{soldeActuel}</Text>
+            <Text style={styles.prevText}>{campsRedux.camp.solde}</Text>
             <Text style={[styles.prevTextType, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{typeTransaction == 1 ? "+" : "-"}</Text>
             <Text style={[styles.prevText, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{montant}</Text>
             <Text style={styles.prevTextRes}>= {newSolde}</Text>
@@ -286,29 +332,54 @@ export default function componentName({ navigation: { goBack } }) {
             containerStyle={{ width: '100%', marginLeft: 0 }}
           />
         </View>
-        <Overlay overlayStyle={{ borderRadius: 15 }} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
-          <View style={{ width: 275, height: 100, justifyContent: 'center' }}>
-            <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>Confimer la transaction</Text>
-            <View style={{ flexDirection: 'row', marginLeft: 15 }}>
-              <Button
-                title="Oui"
-                type="outline"
-                onPress={storeData}
-                buttonStyle={styles.buttonOverlay}
-                titleStyle={styles.buttonSaveTitle}
-                containerStyle={{ flex: 1 }}
-              />
-              <Button
-                title="Non"
-                onPress={toggleOverlay}
-                type="outline"
-                buttonStyle={styles.buttonOverlay}
-                titleStyle={styles.buttonSaveTitle}
-                containerStyle={{ flex: 1 }}
-              />
-            </View>
+        <Overlay backdropStyle={styles.overLayBg} overlayStyle={{borderRadius:15}} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
 
-          </View>
+          {transactionValid ? 
+            
+            <View style={{ width: 275, height: 155, paddingHorizontal:10}}>
+              <Text style={{ textAlign: 'left', fontSize: 20, paddingBottom: 15 }}>La transaction a bien été validée.</Text>
+                <Button
+                  title="Nouvelle transaction"
+                  type="outline"
+                  onPress={() => endOfContinue()}
+                  buttonStyle={styles.buttonOverlayOk}
+                  titleStyle={styles.buttonSaveTitleOk}
+                  containerStyle={{marginBottom:5}}
+                />
+                <Button
+                  title="Quitter"
+                  onPress={() => endOfGoBack()}
+                  type="outline"
+                  buttonStyle={styles.buttonOverlayOk2}
+                  titleStyle={styles.buttonSaveTitleOk2}
+
+                />        
+            </View>
+            :
+            <View style={{ width: 275, height: 100, justifyContent: 'center' }}>
+              <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>Confimer la transaction</Text>
+              <View style={{ flexDirection: 'row', marginLeft: 15 }}>
+                <Button
+                  title="Oui"
+                  type="outline"
+                  onPress={storeData}
+                  buttonStyle={styles.buttonOverlay}
+                  titleStyle={styles.buttonSaveTitleOk}
+                  containerStyle={{ flex: 1 }}
+                />
+                <Button
+                  title="Non"
+                  onPress={toggleOverlay}
+                  type="outline"
+                  buttonStyle={styles.buttonOverlay2}
+                  titleStyle={styles.buttonSaveTitleOk2}
+                  containerStyle={{ flex: 1 }}
+                />
+              </View>
+
+            </View>
+          }
+
         </Overlay>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -323,6 +394,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     color: colors.CUS_WHITE
+  },
+  overLayBg:{
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   prevText: {
     fontSize: 18,
@@ -477,11 +551,40 @@ const styles = StyleSheet.create({
   },
   buttonOverlay: {
     borderColor: colors.GREEN,
+    borderWidth:2,
     height: 40,
+    borderRadius:25,
     width: 115,
+  },
+  buttonOverlay2: {
+    borderColor: colors.RED,
+    borderWidth:2,
+    height: 40,
+    borderRadius:25,
+    width: 115,
+  },
+  buttonOverlayOk: {
+    borderColor: colors.GREEN,
+    borderWidth:2,
+    height: 40,
+    borderRadius:25,
+    width:"100%"
+  },
+  buttonOverlayOk2: {
+    borderColor: colors.RED,
+    borderWidth:2,
+    borderRadius:25,
+    height: 40,
+    width:"100%"
   },
   buttonSaveTitle: {
     color: colors.GREEN,
+  },
+  buttonSaveTitleOk: {
+    color: colors.GREEN,
+  },
+  buttonSaveTitleOk2: {
+    color: colors.RED,
   },
   buttonTitle: {
     color: colors.LIGHT_WHITE,
