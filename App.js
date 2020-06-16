@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import NavigationBottom from './src/navigation/BottomNav'
 import StatusBar from './src/components/statusBar'
 import { View } from 'react-native'
@@ -8,6 +8,7 @@ import store from './src/redux/store'
 
 
 export default function App() {
+
   return (
     <StoreProvider store={store}>
       <View style={{ flex: 1, backgroundColor: colors.DARK_PRIMARY }}>

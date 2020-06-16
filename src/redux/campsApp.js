@@ -1,10 +1,7 @@
-// import the dependency
-import remove from 'lodash.remove'
-
-
 // Action Types
 export const ADD_CAMP = 'ADD_CAMP'
 export const ADD_TRANSA = 'ADD_TRANSA'
+export const ADD_ALL_TRANSA = 'ADD_ALL_TRANSA'
 
 
 // Action Creators
@@ -26,15 +23,23 @@ export function addtransa(transa) {
   }
 }
 
+export function addalltransa(allTransa) {
+  return {
+    type: ADD_ALL_TRANSA,
+    allTransa,
+    id: allTransa.name+campID++
+  }
+}
+
 // reducer
 
 const initialState = {}
 
 function campsReducer(state = initialState, action) {
-  console.log("___");
   switch (action.type) {
     case ADD_CAMP:
       return {
+            id: action.camp.id,
             name: action.camp.name,
             solde: action.camp.solde,
       }
@@ -48,7 +53,13 @@ function campsReducer(state = initialState, action) {
         }   
       }
 
-
+      case ADD_ALL_TRANSA:
+      return {
+        ...state,
+        transactions:{
+          [action.id]: action.allTransa,
+        }   
+      }
     default:
       return state
   }

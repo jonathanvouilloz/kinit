@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import React, { useState, useEffect} from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView, Image, ActivityIndicator } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
@@ -7,9 +7,14 @@ import {Picker} from '@react-native-community/picker'
 
 
 
-export default function componentName({ navigation: { goBack }, route }) {
+export default function componentName({navigation: { goBack }, route }) {
     const [selectedValue, setSelectedValue] = useState("CHF");
-    const { item } = route.params;
+    const {date, name, currency, type, image, montant} = route.params.item;
+    
+    const item = route.params.item;
+    console.log(item);
+    
+
     return (
         <ScrollView style={styles.main}>
             <View style={styles.containerTitle}>
@@ -24,14 +29,14 @@ export default function componentName({ navigation: { goBack }, route }) {
                 <View style={styles.goBack} />
             </View>
             <View style={styles.descrContainer}> 
-                <Text style={styles.description}>{item.name}</Text>
+                <Text style={styles.description}>{name}</Text>
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
-                    <Text style={styles.textTypeTransa}>Crédit de:</Text>
+                    <Text style={styles.textTypeTransa}>{type === 0 ? "Débit de" : type === 1 ? "Crédit de:" : "Caution de"}</Text>
                 </View>
                 <View style={styles.amountTransa}>
-                    <TextInput value={item.solde} keyboardType="number-pad" style={styles.textAmount}></TextInput>
+                    <TextInput value={montant.toString()} keyboardType="number-pad" style={styles.textAmount}></TextInput>
                 </View>
                 <View style={styles.updateTransa}>
                     <View style={{ borderRadius: 25, overflow: 'hidden' }}>
@@ -49,8 +54,11 @@ export default function componentName({ navigation: { goBack }, route }) {
                 </View>
             </View>
             <View style={styles.containerTransactions}>
-
-            </View>
+                {image === "null" ? <View style={{justifyContent:'center',flex:1, alignItems:'center'}}><Text style={styles.textTypeTransa}>Pas d'image disponible</Text><Icons style={{paddingTop:15}} name="unknowfile1" color={colors.LIGHT_WHITE} size={55} /></View> :
+                
+                <Image source={{uri:`data:image/gif;base64,${image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
+            }
+                    </View>
             <View style={styles.saveContainer}>
                 <Button
                     title="Sauvegarder"
@@ -101,7 +109,6 @@ const styles = StyleSheet.create({
         height:250,
         marginHorizontal: 15,
         paddingTop: 15,
-        backgroundColor: 'yellow'
     },
     textSolde: {
         textAlign: 'right',

@@ -4,7 +4,7 @@ import colors from '../static/color'
 import { Button, Divider } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
 import { addcamp, addtransa } from '../redux/campsApp'
-
+import * as query from "../services/storeNewTransaction"
 
 
 export default function Settings({ navigation }) {
@@ -17,15 +17,23 @@ export default function Settings({ navigation }) {
   const addTransa = transa => dispatch(addtransa(transa))
 
 
-  const storeCampInfos = function(){
-    const camp = { name:name, solde:amount };
-    addCamp(camp);
+  const storeCampInfos = async function () {
+    const campSql = { name: name, solde: amount };
+    //insert sql, on attends -> insertion redux 
+    const resp = await query.insertCamp(campSql);
+    const campRedux = { id: resp, name: name, solde: amount };
+    addCamp(campRedux);
   }
 
+  const downloadResume = async function () {
+
+
+
+  };
 
   const nouveauCamp = async () => {
-    const transa = { name:"transa", solde:"12" };
-    addTransa(transa);
+    //drop all and create
+    query.createTable();
   }
 
   const updateName = function (val) {
@@ -54,7 +62,7 @@ export default function Settings({ navigation }) {
             type="outline"
             buttonStyle={styles.buttonGen}
             titleStyle={styles.buttonGenTitle}
-            onPress={()=>storeCampInfos()}
+            onPress={() => storeCampInfos()}
           />
         </View>
       </View>
@@ -68,6 +76,7 @@ export default function Settings({ navigation }) {
             type="outline"
             buttonStyle={styles.buttonGen}
             titleStyle={styles.buttonGenTitle}
+            onPress={() => downloadResume()}
           />
         </View>
         <View style={{ alignItems: 'center' }}>
@@ -78,7 +87,7 @@ export default function Settings({ navigation }) {
           type="outline"
           buttonStyle={styles.buttonReset}
           titleStyle={styles.buttonResetTitle}
-          onPress={()=>nouveauCamp()}
+          onPress={() => nouveauCamp()}
         />
       </View>
     </ScrollView>

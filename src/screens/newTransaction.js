@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button, ButtonGroup, Overlay } from 'react-native-elements';
 import Constants from 'expo-constants';
-import storeNewEntry from "../services/storeNewTransaction"
 import CheckBox from '@react-native-community/checkbox'
-import {Picker} from '@react-native-community/picker';
+import { Picker } from '@react-native-community/picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import {insertTransaction} from "../services/storeNewTransaction"
 
 
 
@@ -36,13 +37,12 @@ export default function componentName({ navigation: { goBack } }) {
 
 
   useEffect(() => {
-    console.log("helo");
+
     const newSolde = calcNewSolde(typeTransaction, montant);
     setNewSolde(newSolde);
   }, [typeTransaction])
 
   useEffect(() => {
-    console.log("helo");
     const newSolde = calcNewSolde(typeTransaction, montant);
     setNewSolde(newSolde);
   }, [montant])
@@ -61,7 +61,6 @@ export default function componentName({ navigation: { goBack } }) {
 
   const calcNewSolde = function (typeTransa, montantA) {
     let newSoldeV = soldeActuel;
-
     switch (typeTransa) {
       case 0:
         newSoldeV = soldeActuel - montantA;
@@ -77,15 +76,22 @@ export default function componentName({ navigation: { goBack } }) {
     return newSoldeV;
   }
 
-  const storeData = function () {
-    const entry = {
-      "typeTransaction": typeTransaction,
-      "description": description,
-      "montant": montant,
-      "image": image,
-      "devise": devise
+  const storeData = async function () {
+    const type = !caution ? 1 : caution ? 2 : 0;
+    const transa = {
+      typeTransaction: type,
+      name: description,
+      montant: montant,
+      image: image,
+      currency: devise,
+      idCamp : 1,
     }
-    storeNewEntry(entry);
+    //insert transactions
+    const lastInsert = await insertTransaction(transa);
+    //add derniere transa dans le store
+    console.log(lastInsert);
+    
+    //addTransa(lastInsert.rows.item(0));
   }
 
   const updateDevise = function (currency) {
@@ -127,10 +133,27 @@ export default function componentName({ navigation: { goBack } }) {
     });
 
     if (!result.cancelled) {
-      setImage(result.base64);
+      setImage(result.uri);
       setAccepted(true);
     }
+
+
+    _resizeImage(result.uri);
+
   };
+
+  const _resizeImage = async (uri) => {
+    //console.log(uri);
+
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 400 } }],
+      { compress: 1, format: ImageManipulator.SaveFormat.PNG, base64: true }, {
+      base64: true
+    }
+    );
+    setImage(manipResult.base64);
+  }
 
   return (
     <KeyboardAvoidingView style={styles.main}>
@@ -183,7 +206,7 @@ export default function componentName({ navigation: { goBack } }) {
           {/* Input container montant + devise */}
           <View style={styles.containerAmountCurr}>
             <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
-            <View style={styles.textAmountCurr}>   
+            <View style={styles.textAmountCurr}>
               <Picker
                 selectedValue={devise}
                 style={{ height: 40, backgroundColor: colors.LIGHT_PRIMARY, color: colors.CUS_WHITE }}
@@ -204,21 +227,18 @@ export default function componentName({ navigation: { goBack } }) {
 
 
           {/* Input ticket a upload */}
-          <Button
-            icon={
+          <TouchableWithoutFeedback onPress={() => pickImage()}>
+            <View style={styles.button}>
               <Icons
                 name={accepted ? "check" : "camera"}
                 size={35}
                 color={accepted ? colors.GREEN : "white"}
               />
-            }
-            iconRight
-            type="outline"
-            onPress={pickImage}
-            buttonStyle={styles.button}
-            titleStyle={styles.buttonTitle}
-            containerStyle={{ width: '100%', marginLeft: 0 }}
-          />
+            </View>
+          </TouchableWithoutFeedback>
+          {accepted ? <View style={{ height: 200, paddingTop: 15 }}>
+            <Image source={{ uri: `data:image/gif;base64,${image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
+          </View> : <View />}
         </View>
         <View style={styles.ContainerButtonAccept}>
           <Button
@@ -230,33 +250,34 @@ export default function componentName({ navigation: { goBack } }) {
             containerStyle={{ width: '100%', marginLeft: 0 }}
           />
         </View>
-        <Overlay overlayStyle={{borderRadius:15}}  isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
-          <View style={{ width: 275, height: 100, justifyContent:'center' }}>
-            <Text style={{textAlign:'center',fontSize:20, paddingBottom:15}}>Confimer la transaction</Text>
-            <View style={{flexDirection:'row',marginLeft:15}}>
-            <Button
-            title="Oui"
-            type="outline"
-            buttonStyle={styles.buttonOverlay}
-            titleStyle={styles.buttonSaveTitle}
-            containerStyle={{ flex:1 }}
-          />
-          <Button
-            title="Non"
-            type="outline"
-            buttonStyle={styles.buttonOverlay}
-            titleStyle={styles.buttonSaveTitle}
-            containerStyle={{  flex:1  }}
-          />
+        <Overlay overlayStyle={{ borderRadius: 15 }} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
+          <View style={{ width: 275, height: 100, justifyContent: 'center' }}>
+            <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>Confimer la transaction</Text>
+            <View style={{ flexDirection: 'row', marginLeft: 15 }}>
+              <Button
+                title="Oui"
+                type="outline"
+                onPress={storeData}
+                buttonStyle={styles.buttonOverlay}
+                titleStyle={styles.buttonSaveTitle}
+                containerStyle={{ flex: 1 }}
+              />
+              <Button
+                title="Non"
+                onPress={toggleOverlay}
+                type="outline"
+                buttonStyle={styles.buttonOverlay}
+                titleStyle={styles.buttonSaveTitle}
+                containerStyle={{ flex: 1 }}
+              />
             </View>
-           
+
           </View>
         </Overlay>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
 
 const styles = StyleSheet.create({
   main: {
@@ -313,7 +334,7 @@ const styles = StyleSheet.create({
     flex: 2,
     justifyContent: "flex-end",
     marginHorizontal: 15,
-    paddingBottom: 15,
+    marginBottom: 15
   },
   textSolde: {
     textAlign: 'right',
@@ -407,18 +428,21 @@ const styles = StyleSheet.create({
     borderColor: colors.LIGHT_PRIMARY,
     borderRadius: 25,
     backgroundColor: colors.LIGHT_PRIMARY,
-    height: 80
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+
   },
   buttonSave: {
     borderColor: colors.GREEN,
     borderRadius: 25,
     backgroundColor: colors.DARK_PRIMARY,
-    height: 45
+    height: 45,
   },
   buttonOverlay: {
     borderColor: colors.GREEN,
     height: 40,
-    width:115,
+    width: 115,
   },
   buttonSaveTitle: {
     color: colors.GREEN,

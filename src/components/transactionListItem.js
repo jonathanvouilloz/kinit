@@ -4,22 +4,24 @@ import colors from '../static/color'
 import Icons from 'react-native-vector-icons/Entypo';
 
 
-export default function transactionItem({title, goToNewTransaction}) {
+export default function transactionItem({transa, goToNewTransaction}) {    
+    console.log(transa);
+    
   return (
     <View style={styles.main}>
         <View style={styles.leftContainer}>
         <View style={styles.titleContainer2}>
-                <Text style={styles.dateText}>10.05.2020</Text>
+                <Text style={styles.dateText}>{transa.name}</Text>
             </View>
             <View style={styles.titleContainer}>
-                <Text numberOfLines={1} style={styles.titleText}>course lundi migros</Text>
+                <Text numberOfLines={1} style={styles.titleText}>{transa.id}</Text>
             </View>
             <View style={styles.amountContainer}>
                 <Text style={styles.amountText}>~ 45.94 CHF</Text>
             </View>
         </View>
         <View style={styles.rightContainer}>
-            <TouchableWithoutFeedback onPress={() => goToNewTransaction(title)}>
+            <TouchableWithoutFeedback onPress={() => goToNewTransaction()}>
                             <Icons name="dots-three-vertical" color={colors.CUS_WHITE} size={35}></Icons>
             </TouchableWithoutFeedback>
         </View>
