@@ -13,15 +13,15 @@ export default function Settings({ navigation }) {
   const [amount, setAmount] = useState(null);
 
   const dispatch = useDispatch()
+  const campsRedux = useSelector(state => state);
   const addCamp = camp => dispatch(addcamp(camp))
-  const addTransa = transa => dispatch(addtransa(transa))
 
 
   const storeCampInfos = async function () {
     const campSql = { name: name, solde: amount };
     //insert sql, on attends -> insertion redux 
     const resp = await query.insertCamp(campSql);
-    const campRedux = { id: resp, name: name, solde: amount };
+    const campRedux = { id: resp, name: name, solde: amount, soldeInitial:amount };
     addCamp(campRedux);
   }
 
@@ -51,10 +51,17 @@ export default function Settings({ navigation }) {
           <Text style={styles.genTitle}>Paramètres</Text>
         </View>
         <View style={styles.containerGenInput1}>
-          <TextInput style={styles.textAmount} onChangeText={(value) => updateName(value)} placeholder="Nom du camp"></TextInput>
+          <TextInput editable={campsRedux.camp.name ? false : true} 
+                     style={styles.textAmount} onChangeText={(value) => updateName(value)} 
+                     placeholder="Nom du camp" >{campsRedux.camp.name ? campsRedux.camp.name:""}         
+         </TextInput>
         </View>
         <View style={styles.containerGenInput2}>
-          <TextInput keyboardType="number-pad" style={styles.textAmount} onChangeText={(value) => updateSolde(value)} placeholder="Montant"></TextInput>
+          <TextInput editable={campsRedux.camp.name ? false : true}
+                     keyboardType="number-pad"
+                     style={styles.textAmount} onChangeText={(value) => updateSolde(value)} 
+                     placeholder="Solde initial">{campsRedux.camp.soldeInitial ? campsRedux.camp.soldeInitial:""} 
+          </TextInput>
         </View>
         <View style={styles.containerGenInput2}>
           <Button

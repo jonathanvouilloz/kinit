@@ -5,19 +5,25 @@ import Icons from 'react-native-vector-icons/Entypo';
 
 
 export default function transactionItem({transa, goToNewTransaction}) {    
-    console.log(transa);
+    const {date, currency, typeTransaction, montant, name} = transa;
+    const dateFormat = new Date(date).toLocaleDateString();
     
+
   return (
     <View style={styles.main}>
         <View style={styles.leftContainer}>
         <View style={styles.titleContainer2}>
-                <Text style={styles.dateText}>{transa.name}</Text>
+                <Text style={styles.dateText}>{dateFormat}</Text>
             </View>
             <View style={styles.titleContainer}>
-                <Text numberOfLines={1} style={styles.titleText}>{transa.id}</Text>
+                <Text numberOfLines={1} style={styles.titleText}>{name}</Text>
             </View>
             <View style={styles.amountContainer}>
-                <Text style={styles.amountText}>~ 45.94 CHF</Text>
+                {typeTransaction === 0 ?
+                    <Text style={styles.amountTextD}>- {montant} {currency === 0 ? "CHF" : "EUR"}</Text>
+                :  typeTransaction === 1 ? <Text style={styles.amountTextC}>+ {montant} {currency === 0 ? "CHF" : "EUR"}</Text>
+                :   <Text style={styles.amountTextCa}>~ {montant} {currency === 0 ? "CHF" : "EUR"}</Text>
+                }   
             </View>
         </View>
         <View style={styles.rightContainer}>
@@ -62,9 +68,17 @@ const styles = StyleSheet.create({
         justifyContent:'flex-start',
         paddingLeft:15
     },
-    amountText:{
+    amountTextD:{
+        fontSize:25,
+        color:colors.RED
+    },
+    amountTextC:{
         fontSize:25,
         color:colors.GREEN
+    },
+    amountTextCa:{
+        fontSize:25,
+        color:colors.ORANGE
     },
     titleText:{
         fontSize:16,

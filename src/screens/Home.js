@@ -10,8 +10,7 @@ import { addcamp, addalltransa } from '../redux/campsApp'
 
 export default function Home({ navigation }) {
 
-  const camps = useSelector(state => state);
-  const [theArray, setTheArray] = useState([]);
+  const campsRedux = useSelector(state => state);
 
 
   //initial data for redux
@@ -27,28 +26,15 @@ export default function Home({ navigation }) {
   const getInitialData = async function () {
     const camps = await selectCamp();
     const transactions = await selectTransactions();
+    
     if (camps) {
       const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde };
       addCamp(campRedux);
     }else{
-      console.log("pas de camps");  
+      console.log("pas de camp");  
     }
     if(transactions){
-      let arr = []
-      for(let i = 0; i < transactions.length; i++){        
-        const transa = { 
-          id: transactions.item(i).id,
-          name: transactions.item(i).name,
-          montant: transactions.item(i).montant,
-          currency: transactions.item(i).currency, 
-          image: transactions.item(i).image, 
-          date: transactions.item(i).date,
-          type: transactions.item(i).typeTransaction,     
-        };
-        arr.push(transa);      
-      }
-      setTheArray(arr);
-      addAllTransa(theArray)
+      addAllTransa(transactions)
     }
   }
 
@@ -56,10 +42,11 @@ export default function Home({ navigation }) {
   return (
     <View style={styles.main}>
       <View style={styles.containerTitle}>
-        <Text style={styles.title}>{camps.name ? camps.name : "Aucun camp actif"}</Text>
+        <Text style={styles.title}>{campsRedux.camp.name ? campsRedux.camp.name : "Aucun camp actif"}</Text>
       </View>
       <View style={styles.containerSolde}>
-        <Text style={styles.textSolde}>{camps.solde ? camps.solde : "-"} CHF</Text>
+        <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde : "-"} CHF</Text>
+        <Text style={styles.textCaution}>(fonctionnalité à venir)</Text>
       </View>
       <View style={styles.containerAddTransactions}>
         <TouchableWithoutFeedback onPress={() => navigation.navigate('AddTransaction')}>
@@ -68,7 +55,7 @@ export default function Home({ navigation }) {
       </View>
       <View style={styles.containerTransactions}>
         <FlatList
-          data={theArray}
+          data={campsRedux.transactions}
           renderItem={({ item }) => <TransactionListItem transa={item} goToNewTransaction={() => navigation.navigate('Details', { item: item })} />}
 
           keyExtractor={item => item.id.toString()}
@@ -103,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   containerTransactions: {
-    flex: 5,
+    flex: 4,
     marginHorizontal: 15,
     paddingTop: 15
   },
@@ -111,6 +98,11 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 50,
     color: colors.GREEN
+  },
+  textCaution: {
+    textAlign: 'right',
+    fontSize: 14,
+    color: "#C8C8C8"
   },
   containerAddTransactions: {
     flex: 1,

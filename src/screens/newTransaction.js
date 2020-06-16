@@ -9,6 +9,8 @@ import CheckBox from '@react-native-community/checkbox'
 import { Picker } from '@react-native-community/picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import {insertTransaction} from "../services/storeNewTransaction"
+import { addtransa, addtransafirst, addcamp } from '../redux/campsApp'
+import {useDispatch, useSelector } from 'react-redux'
 
 
 
@@ -35,9 +37,15 @@ export default function componentName({ navigation: { goBack } }) {
 
   const buttons = [{ element: débit }, { element: crédit }]
 
+  //redux
+  const addTransaFirst = transa => dispatch(addtransafirst(transa));
+  const addTransa = transa => dispatch(addtransa(transa));
+  const addCamp = camp => dispatch(addcamp(camp))
+  const dispatch = useDispatch()
+  const campsRedux = useSelector(state => state);
+
 
   useEffect(() => {
-
     const newSolde = calcNewSolde(typeTransaction, montant);
     setNewSolde(newSolde);
   }, [typeTransaction])
@@ -48,7 +56,7 @@ export default function componentName({ navigation: { goBack } }) {
   }, [montant])
 
 
-  const updateType = function (type) {
+  const updateType = function (type) {    
     setTransaction(type);
     if (type === 1) {
       setCaution(false);
@@ -77,7 +85,15 @@ export default function componentName({ navigation: { goBack } }) {
   }
 
   const storeData = async function () {
-    const type = !caution ? 1 : caution ? 2 : 0;
+    let type;
+    if(typeTransaction === 0 && caution){
+      type=2;
+    }else if (typeTransaction === 0){
+      type=0;
+      
+    }else{
+      type=1;
+    }
     const transa = {
       typeTransaction: type,
       name: description,
@@ -88,10 +104,30 @@ export default function componentName({ navigation: { goBack } }) {
     }
     //insert transactions
     const lastInsert = await insertTransaction(transa);
-    //add derniere transa dans le store
-    console.log(lastInsert);
+    //add derniere transa dans le store 
+    const insertTransaRedux = {
+      id : lastInsert.results.id,
+      currency :lastInsert.results.currency,
+      name: lastInsert.results.name,
+      typeTransaction : lastInsert.results.typeTransaction,
+      montant :lastInsert.results.montant,
+      image : lastInsert.results.image,
+      date : lastInsert.results.date
+    }   
+    if(lastInsert.first){
+      console.log("first time");
+      
+      addTransaFirst(insertTransaRedux);
+    } else{
+      addTransa(insertTransaRedux);
+    }
     
-    //addTransa(lastInsert.rows.item(0));
+  
+    const campUpdated = {
+      name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: lastInsert.camp.solde
+    }
+    addCamp(campUpdated);
+
   }
 
   const updateDevise = function (currency) {

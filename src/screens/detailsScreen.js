@@ -5,11 +5,9 @@ import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
 import {Picker} from '@react-native-community/picker'
 
-
-
 export default function componentName({navigation: { goBack }, route }) {
     const [selectedValue, setSelectedValue] = useState("CHF");
-    const {date, name, currency, type, image, montant} = route.params.item;
+    const {date, name, currency, typeTransaction, image, montant} = route.params.item;
     
     const item = route.params.item;
     console.log(item);
@@ -33,7 +31,7 @@ export default function componentName({navigation: { goBack }, route }) {
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
-                    <Text style={styles.textTypeTransa}>{type === 0 ? "Débit de" : type === 1 ? "Crédit de:" : "Caution de"}</Text>
+                    <Text style={styles.textTypeTransa}>{typeTransaction === 0 ? "Débit de" : typeTransaction === 1 ? "Crédit de:" : "Caution de"}</Text>
                 </View>
                 <View style={styles.amountTransa}>
                     <TextInput value={montant.toString()} keyboardType="number-pad" style={styles.textAmount}></TextInput>
@@ -49,8 +47,6 @@ export default function componentName({navigation: { goBack }, route }) {
                             <Picker.Item label="EUR" value="EUR" />
                         </Picker>
                     </View>
-
-
                 </View>
             </View>
             <View style={styles.containerTransactions}>
@@ -67,13 +63,16 @@ export default function componentName({navigation: { goBack }, route }) {
                     titleStyle={styles.buttonTitle}
                     containerStyle={{ width: '100%', marginLeft: 0, marginBottom:10 }}
                 />
+                {typeTransaction === 2 ?
                 <Button
-                    title="Transaction récupérée"
+                    title="Caution récupérée"
                     type="outline"
                     buttonStyle={styles.buttonV2}
                     titleStyle={styles.buttonTitleV2}
                     containerStyle={{ width: '100%', marginLeft: 0 }}
-                />
+                />:
+                <View />
+                }
             </View>
         </ScrollView>
     );

@@ -77,6 +77,10 @@ export const insertCamp = async function (camp) {
 export const insertTransaction = async function (transa) {
   const date = new Date().getTime();
   const db = SQLite.openDatabase('campsDB');
+  let campUpdated;
+  //montant a operér
+  const montantTransaction = parseFloat(transa.montant);
+
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql('INSERT INTO transactions (name, montant, currency, image, date, typeTransaction, camp_id) VALUES (?,?,?,?,?,?,?)',
@@ -84,14 +88,63 @@ export const insertTransaction = async function (transa) {
         (tx, results) => {
 
           db.transaction(function (tx) {
-            tx.executeSql('select * from transactions where id = ?', [results.insertId],
+            tx.executeSql('select * from camp where id = ?', [transa.idCamp],
               (tx, results) => {
-                resolve(results.rows.item(0));
+                //calcul
+                const campUpdate = results.rows.item(0);
+                let newSolde;
+                let soldeActuel = parseFloat(campUpdate.solde);
+                switch (transa.typeTransaction) {
+                  case 0:
+                    newSolde = soldeActuel - montantTransaction;
+                    break;
+                  case 1:
+                    newSolde = soldeActuel + montantTransaction;
+                    break;
+                  default:
+                    newSolde = soldeActuel - montantTransaction;
+                    break;
+                }
+                //update le solde du camp
+                db.transaction(function (tx) {
+                  tx.executeSql("update camp set solde = ? where id = ?", [newSolde, transa.idCamp],
+                  (tx) => {
+                    db.transaction(function (tx) {
+                      tx.executeSql('select * from transactions where camp_id = ? order by id desc', [transa.idCamp],
+                        (tx, results) => {
+          
+                          const transactions = results.rows.item(0);
+                          const nbRows = results.rows.length;
+          
+                          tx.executeSql("Select * from camp where id = ?",[transa.idCamp],
+                          (tx, results) => {
+                              const camp = results.rows.item(0);
+                              if (nbRows === 1) {       
+                                resolve({ first: true, results: transactions, camp:camp })
+                                console.log(transactions, " ", camp);
+                                
+                              } else {
+                                resolve({ first: false, results: transactions, camp:camp })
+                                console.log(transactions, " ", camp);
+          
+                              }
+                          }
+                          )
+                          
+                        }
+                      )
+                    }, function (err) {
+                      console.log(err);
+                    });
+                  }   
+                  )
+                }
+                )
               }
             )
           }, function (err) {
             console.log(err);
-          });
+          });     
         }
       )
     }, function (err) {
@@ -126,10 +179,23 @@ export const selectTransactions = async function () {
   const db = SQLite.openDatabase('campsDB');
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
-      tx.executeSql('select * from transactions', [],
-        (tx, results) => {        
-          if (results.rows.length > 0) {    
-            resolve(results.rows);
+      tx.executeSql('select * from transactions order by id desc', [],
+        (tx, results) => {
+          let arr = []
+          for (let i = 0; i < results.rows.length; i++) {
+            const transa = {
+              id: results.rows.item(i).id,
+              name: results.rows.item(i).name,
+              montant: results.rows.item(i).montant,
+              currency: results.rows.item(i).currency,
+              image: results.rows.item(i).image,
+              date: results.rows.item(i).date,
+              typeTransaction: results.rows.item(i).typeTransaction,
+            };
+            arr.push(transa);
+          }
+          if (results.rows.length > 0) {
+            resolve(arr);
           } else {
             resolve(false);
           }
@@ -149,8 +215,8 @@ export const selectTransaction = async function (id) {
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql('select * from transactions where id = ?', [id],
-        (tx, results) => {        
-            resolve(results);
+        (tx, results) => {
+          resolve(results);
         }
       )
     }, function (err) {
@@ -158,4 +224,10 @@ export const selectTransaction = async function (id) {
     });
   }
   )
+}
+
+
+const selectCampOperation = (id) => {
+  const db = SQLite.openDatabase('campsDB');
+
 }
