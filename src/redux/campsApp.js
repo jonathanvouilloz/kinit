@@ -53,6 +53,7 @@ function campsReducer(state = initialState, action) {
           name: action.camp.name,
           solde: action.camp.solde,
           soldeInitial: action.camp.soldeInitial,
+          caution: action.camp.caution,
         },
         transactions: [...state.transactions]
       }

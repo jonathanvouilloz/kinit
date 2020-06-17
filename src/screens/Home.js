@@ -26,9 +26,16 @@ export default function Home({ navigation }) {
   const getInitialData = async function () {
     const camps = await selectCamp();
     const transactions = await selectTransactions();
+
+    let sousCaution = 0;
+    for(let i = 0;i<transactions.length;i++){
+      if(transactions[i].typeTransaction === 2){
+        sousCaution = sousCaution + transactions[i].montant
+      }
+    }
     
     if (camps) {
-      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial };
+      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial, caution:parseFloat(sousCaution).toFixed(2) };
       addCamp(campRedux);
     }else{
       console.log("pas de camp");  
@@ -36,6 +43,9 @@ export default function Home({ navigation }) {
     if(transactions){
       addAllTransa(transactions)
     }
+
+    
+    
   }
 
   const goToAddNewTransactions = function(){
@@ -60,7 +70,7 @@ export default function Home({ navigation }) {
       </View>
       <View style={styles.containerSolde}>
         <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde : "-"} CHF</Text>
-        <Text style={styles.textCaution}>(fonctionnalité à venir)</Text>
+        <Text style={styles.textCaution}>{campsRedux.camp.caution ? "dont CHF "+campsRedux.camp.caution +" de caution" : ""}</Text>
       </View>
       <View style={styles.containerAddTransactions}>
         <TouchableWithoutFeedback onPress={()=>goToAddNewTransactions()}>

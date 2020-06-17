@@ -5,7 +5,11 @@ import { Button, Divider } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
 import { addcamp, reset } from '../redux/campsApp'
 import * as query from "../services/storeNewTransaction"
-
+import * as Print from 'expo-print';
+import * as MediaLibrary from 'expo-media-library';
+import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system'
+import {createPdf} from '../services/createPdf'
 
 export default function Settings({ navigation }) {
 
@@ -24,19 +28,59 @@ export default function Settings({ navigation }) {
     const campSql = { name: name, solde: amount };
     //insert sql, on attends -> insertion redux 
     const resp = await query.insertCamp(campSql);
-    const campRedux = { id: resp, name: name, solde: amount, soldeInitial:amount };
+    const campRedux = { id: resp, name: name, solde: amount, soldeInitial:amount, caution:0 };
     addCamp(campRedux);
+  }
+
+  async function getLocationAsync() {
+    // permissions returns only for location permissions on iOS and under certain conditions, see Permissions.LOCATION
+    const { status, permissions } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (status === 'granted') {
+      return true;
+    } else {
+      throw new Error('Location permission not granted');
+    }
   }
 
   const downloadResume = async function () {
       //todo
-  };
+  
+      
+      const response = await Print.printToFileAsync({
+        html: await createPdf(),
+        width:793,
+        height:1122,
+        base64:true
+      })
+
+    // this changes the bit after the last slash of the uri (the document's name) to "invoice_<date of transaction"
+      
+      const newName = response.uri.slice(0, response.uri.lastIndexOf('/'))+"/invoice.pdf"
+
+    const pdfName = `${response.uri.slice(0,
+        response.uri.lastIndexOf('/') + 1
+        )}invoice.pdf`
+
+        await FileSystem.copyAsync({
+            from: response.uri,
+            to: newName,
+        })        
+      
+        
+      if(getLocationAsync()){
+        MediaLibrary.saveToLibraryAsync(newName);
+      }
+      
+      }
+
+      
 
   const nouveauCamp = async () => {
     //drop all and create + vider store
     resetAll();
     query.createTable();
   }
+
 
   const updateName = function (val) {
     setName(val)

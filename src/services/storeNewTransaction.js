@@ -56,7 +56,7 @@ export const insertCamp = async function (camp) {
         (tx, results) => {
           db.transaction(function (tx) {
             tx.executeSql('select * from camp where id = 1', [],
-              (tx, results) => {           
+              (tx, results) => {
                 resolve(results);
               }
             )
@@ -99,7 +99,7 @@ export const insertTransaction = async function (transa) {
                     newSolde = soldeActuel - montantTransaction;
                     break;
                   case 1:
-                    newSolde = soldeActuel + montantTransaction/1;
+                    newSolde = soldeActuel + montantTransaction / 1;
                     break;
                   default:
                     newSolde = soldeActuel - montantTransaction;
@@ -108,35 +108,35 @@ export const insertTransaction = async function (transa) {
                 //update le solde du camp
                 db.transaction(function (tx) {
                   tx.executeSql("update camp set solde = ? where id = ?", [parseFloat(newSolde).toFixed(2), transa.idCamp],
-                  (tx) => {
-                    db.transaction(function (tx) {
-                      tx.executeSql('select * from transactions where camp_id = ? order by id desc', [transa.idCamp],
-                        (tx, results) => {
-          
-                          const transactions = results.rows.item(0);
-                          const nbRows = results.rows.length;
-          
-                          tx.executeSql("Select * from camp where id = ?",[transa.idCamp],
+                    (tx) => {
+                      db.transaction(function (tx) {
+                        tx.executeSql('select * from transactions where camp_id = ? order by id desc', [transa.idCamp],
                           (tx, results) => {
-                              const camp = results.rows.item(0);
-                              if (nbRows === 1) {       
-                                resolve({ first: true, results: transactions, camp:camp })
-                                console.log(transactions, " ", camp);
-                                
-                              } else {
-                                resolve({ first: false, results: transactions, camp:camp })
-                                console.log(transactions, " ", camp);
-          
+
+                            const transactions = results.rows.item(0);
+                            const nbRows = results.rows.length;
+
+                            tx.executeSql("Select * from camp where id = ?", [transa.idCamp],
+                              (tx, results) => {
+                                const camp = results.rows.item(0);
+                                if (nbRows === 1) {
+                                  resolve({ first: true, results: transactions, camp: camp })
+                                  console.log(transactions, " ", camp);
+
+                                } else {
+                                  resolve({ first: false, results: transactions, camp: camp })
+                                  console.log(transactions, " ", camp);
+
+                                }
                               }
+                            )
+
                           }
-                          )
-                          
-                        }
-                      )
-                    }, function (err) {
-                      console.log(err);
-                    });
-                  }   
+                        )
+                      }, function (err) {
+                        console.log(err);
+                      });
+                    }
                   )
                 }
                 )
@@ -144,7 +144,7 @@ export const insertTransaction = async function (transa) {
             )
           }, function (err) {
             console.log(err);
-          });     
+          });
         }
       )
     }, function (err) {
@@ -188,7 +188,6 @@ export const selectTransactions = async function () {
               name: results.rows.item(i).name,
               montant: results.rows.item(i).montant,
               currency: results.rows.item(i).currency,
-              image: results.rows.item(i).image,
               date: results.rows.item(i).date,
               typeTransaction: results.rows.item(i).typeTransaction,
             };
@@ -199,7 +198,6 @@ export const selectTransactions = async function () {
           } else {
             resolve(false);
           }
-
         }
       )
     }, function (err) {
@@ -209,6 +207,38 @@ export const selectTransactions = async function () {
   )
 }
 
+export const selectTransactionsForPdf = async function () {
+  const db = SQLite.openDatabase('campsDB');
+  return new Promise((resolve, reject) => {
+    db.transaction(function (tx) {
+      tx.executeSql('select * from transactions order by id desc', [],
+        (tx, results) => {
+          let arr = []
+          for (let i = 0; i < results.rows.length; i++) {
+            const transa = {
+              id: results.rows.item(i).id,
+              name: results.rows.item(i).name,
+              montant: results.rows.item(i).montant,
+              currency: results.rows.item(i).currency,
+              date: results.rows.item(i).date,
+              typeTransaction: results.rows.item(i).typeTransaction,
+              image:results.rows.item(i).image,
+            };
+            arr.push(transa);
+          }
+          if (results.rows.length > 0) {
+            resolve(arr);
+          } else {
+            resolve(false);
+          }
+        }
+      )
+    }, function (err) {
+      console.log(err);
+    });
+  }
+  )
+}
 
 export const selectTransaction = async function (id) {
   const db = SQLite.openDatabase('campsDB');
@@ -216,7 +246,7 @@ export const selectTransaction = async function (id) {
     db.transaction(function (tx) {
       tx.executeSql('select * from transactions where id = ?', [id],
         (tx, results) => {
-          resolve(results);
+          resolve(results.rows.item(0));
         }
       )
     }, function (err) {
@@ -227,7 +257,40 @@ export const selectTransaction = async function (id) {
 }
 
 
-const selectCampOperation = (id) => {
-  const db = SQLite.openDatabase('campsDB');
+export const recupCaution = async function (id, montant, solde) {
 
+  const db = SQLite.openDatabase('campsDB');
+  return new Promise((resolve, reject) => {
+    db.transaction(function (tx) {
+      tx.executeSql('update camp set solde = ?', [solde / 1 + montant / 1],
+        (tx, results) => {
+          tx.executeSql("delete from transactions where id = ?", [id]),
+            tx.executeSql('select * from transactions order by id desc', [],
+              (tx, results) => {
+                let arr = []
+                for (let i = 0; i < results.rows.length; i++) {
+                  const transa = {
+                    id: results.rows.item(i).id,
+                    name: results.rows.item(i).name,
+                    montant: results.rows.item(i).montant,
+                    currency: results.rows.item(i).currency,
+                    date: results.rows.item(i).date,
+                    typeTransaction: results.rows.item(i).typeTransaction,
+                  };
+                  arr.push(transa);
+                }
+                if (results.rows.length > 0) {
+                  resolve(arr);
+                } else {
+                  resolve(false);
+                }
+              }
+            )
+        }
+      )
+    }, function (err) {
+      console.log(err);
+    });
+  }
+  )
 }

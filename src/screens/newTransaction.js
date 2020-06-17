@@ -68,13 +68,13 @@ export default function componentName({ navigation: { goBack } }) {
     let newSoldeC = newSolde;
     switch (typeTransa) {
       case 0:
-        setNewSolde(campsRedux.camp.solde - montantA)
+        setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
         break;
       case 1:
-        setNewSolde(campsRedux.camp.solde + montantA/1)
+        setNewSolde(parseFloat(campsRedux.camp.solde + montantA/1).toFixed(2))
         break;
       default:
-        setNewSolde(campsRedux.camp.solde - montantA)
+        setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
         break;
     }
   }
@@ -106,8 +106,8 @@ export default function componentName({ navigation: { goBack } }) {
     }
 
 
-    /*
-    if (image === "null") {
+    
+    if (image === "null" && !caution) {
       setValidVisible(!isModalValiation);
       ToastAndroid.showWithGravityAndOffset(
         "Merci d'attacher une image à cette transaction",
@@ -117,7 +117,7 @@ export default function componentName({ navigation: { goBack } }) {
         50
       );
       return
-    }*/
+    }
 
     let type;
     if (typeTransaction === 0 && caution) {
@@ -152,14 +152,25 @@ export default function componentName({ navigation: { goBack } }) {
     if (lastInsert.first) {
       addTransaFirst(insertTransaRedux);
     } else {
-      addTransa(insertTransaRedux);
+      addTransa(insertTransaRedux); 
     }
 
 
-    const campUpdated = {
-      id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial
+
+    const cautionUpdated = parseFloat(campsRedux.camp.caution).toFixed(2)/1 + parseFloat(montant).toFixed(2)/1;
+
+    if(caution){
+      const campUpdated = {
+        id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial, caution: cautionUpdated
+      }
+      addCamp(campUpdated);
+    }else{
+      const campUpdated = {
+        id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial, caution: campsRedux.camp.caution
+      }
+      addCamp(campUpdated);
     }
-    addCamp(campUpdated);
+    
 
     setTransactionValid(!transactionValid);
 
@@ -187,6 +198,7 @@ export default function componentName({ navigation: { goBack } }) {
   const endOfContinue = function(){
       toggleOverlay();
       setTransactionValid(!transactionValid);
+      setCaution(false);
   }
   const endOfGoBack = async function(){
       await toggleOverlay();
@@ -337,7 +349,7 @@ export default function componentName({ navigation: { goBack } }) {
           {transactionValid ? 
             
             <View style={{ width: 275, height: 155, paddingHorizontal:10}}>
-              <Text style={{ textAlign: 'left', fontSize: 20, paddingBottom: 15 }}>La transaction a bien été validée.</Text>
+              <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>La transaction a bien été validée.</Text>
                 <Button
                   title="Nouvelle transaction"
                   type="outline"
@@ -356,9 +368,9 @@ export default function componentName({ navigation: { goBack } }) {
                 />        
             </View>
             :
-            <View style={{ width: 275, height: 100, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>Confimer la transaction</Text>
-              <View style={{ flexDirection: 'row', marginLeft: 15 }}>
+            <View style={{ width: 275, height: 100 }}>
+              <Text style={{ textAlign: 'center',alignItems:'flex-end', fontSize: 20,flex:1 }}>Confimer la transaction</Text>
+              <View style={{ flexDirection: 'row',alignItems:'center', marginLeft: 15,flex:1 }}>
                 <Button
                   title="Oui"
                   type="outline"

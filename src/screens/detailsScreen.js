@@ -4,17 +4,49 @@ import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
 import {Picker} from '@react-native-community/picker'
+import { selectTransaction, recupCaution } from '../services/storeNewTransaction'
+import { useSelector, useDispatch } from 'react-redux'
+import { addcamp, addalltransa } from '../redux/campsApp'
+
 
 export default function componentName({navigation: { goBack }, route }) {
+
+
     const [selectedValue, setSelectedValue] = useState("CHF");
-    const {date, name, currency, typeTransaction, image, montant} = route.params.item;
-    
-    const item = route.params.item;
-    console.log(item);
-    
+    const [loaded, setLoaded] = useState(false);
+    const [transa, setTransa] = useState({transa:"null"});
+
+    const campsRedux = useSelector(state => state);
+    const dispatch = useDispatch()
+    const addAllTransa = theArray => dispatch(addalltransa(theArray))
+    const addCamp = camp => dispatch(addcamp(camp))
+
+       
+    useEffect(() => {
+        getInitialData();
+      }, [])
+
+    const getInitialData = async function(){
+        const transaction = await selectTransaction(route.params.item.id);
+        setTransa(transaction)
+        setLoaded(true);
+    }
+
+    const updateCaution = async function(){
+        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde);
+        if(caution){
+            addAllTransa(caution);
+            let newCaution = campsRedux.camp.caution/1-route.params.item.montant/1;
+            const campUpdated = { id: campsRedux.camp.id, name: campsRedux.camp.name, solde: campsRedux.camp.solde/1+route.params.item.montant/1, soldeInitial: campsRedux.camp.soldeInitial, caution: parseFloat(newCaution).toFixed(2)};
+            addCamp(campUpdated);
+          } 
+        goBack();
+    }
 
     return (
         <ScrollView style={styles.main}>
+            {loaded ? 
+            <View>
             <View style={styles.containerTitle}>
                 <View style={styles.goBack}>
                     <TouchableWithoutFeedback onPress={() => goBack()}>
@@ -27,14 +59,14 @@ export default function componentName({navigation: { goBack }, route }) {
                 <View style={styles.goBack} />
             </View>
             <View style={styles.descrContainer}> 
-                <Text style={styles.description}>{name}</Text>
+                <Text style={styles.description}>{transa.name}</Text>
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
-                    <Text style={styles.textTypeTransa}>{typeTransaction === 0 ? "Débit de" : typeTransaction === 1 ? "Crédit de:" : "Caution de"}</Text>
+                    <Text style={styles.textTypeTransa}>{transa.typeTransaction === 0 ? "Débit de" : transa.typeTransaction === 1 ? "Crédit de:" : "Caution de"}</Text>
                 </View>
                 <View style={styles.amountTransa}>
-                    <TextInput value={montant.toString()} keyboardType="number-pad" style={styles.textAmount}></TextInput>
+                    <TextInput value={transa.montant.toString()} keyboardType="number-pad" style={styles.textAmount}></TextInput>
                 </View>
                 <View style={styles.updateTransa}>
                     <View style={{ borderRadius: 25, overflow: 'hidden' }}>
@@ -50,9 +82,9 @@ export default function componentName({navigation: { goBack }, route }) {
                 </View>
             </View>
             <View style={styles.containerTransactions}>
-                {image === "null" ? <View style={{justifyContent:'center',flex:1, alignItems:'center'}}><Text style={styles.textTypeTransa}>Pas d'image disponible</Text><Icons style={{paddingTop:15}} name="unknowfile1" color={colors.LIGHT_WHITE} size={55} /></View> :
+                {transa.image === "null" ? <View style={{justifyContent:'center',flex:1, alignItems:'center'}}><Text style={styles.textTypeTransa}>Pas d'image disponible</Text><Icons style={{paddingTop:15}} name="unknowfile1" color={colors.LIGHT_WHITE} size={55} /></View> :
                 
-                <Image source={{uri:`data:image/gif;base64,${image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
+                <Image source={{uri:`data:image/gif;base64,${transa.image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
             }
                     </View>
             <View style={styles.saveContainer}>
@@ -63,10 +95,11 @@ export default function componentName({navigation: { goBack }, route }) {
                     titleStyle={styles.buttonTitle}
                     containerStyle={{ width: '100%', marginLeft: 0, marginBottom:10 }}
                 />
-                {typeTransaction === 2 ?
+                {transa.typeTransaction === 2 ?
                 <Button
                     title="Caution récupérée"
                     type="outline"
+                    onPress={()=>updateCaution()}
                     buttonStyle={styles.buttonV2}
                     titleStyle={styles.buttonTitleV2}
                     containerStyle={{ width: '100%', marginLeft: 0 }}
@@ -74,6 +107,12 @@ export default function componentName({navigation: { goBack }, route }) {
                 <View />
                 }
             </View>
+            </View>
+            : 
+            <View>
+                <ActivityIndicator size="large" color={colors.LIGHT_WHITE} />
+            </View>
+            }
         </ScrollView>
     );
 }
