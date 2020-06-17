@@ -45,11 +45,8 @@ export default function Settings({ navigation }) {
   const downloadResume = async function () {
       //todo
   
-      
       const response = await Print.printToFileAsync({
         html: await createPdf(),
-        width:793,
-        height:1122,
         base64:true
       })
 

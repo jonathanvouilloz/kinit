@@ -220,7 +220,7 @@ export default function componentName({ navigation: { goBack } }) {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      quality: 0.3,
+      quality: 1,
       base64: true,
     },);
 
@@ -242,7 +242,7 @@ export default function componentName({ navigation: { goBack } }) {
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
       [{ resize: { width: 400 } }],
-      { compress: 1, format: ImageManipulator.SaveFormat.PNG, base64: true }, {
+      { compress: 1, format: ImageManipulator.SaveFormat.JPG, base64: true }, {
       base64: true
     }
     );
