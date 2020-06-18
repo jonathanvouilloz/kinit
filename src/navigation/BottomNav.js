@@ -41,11 +41,11 @@ export default function BottomNav() {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
+            if (route.name === 'Accueil') {
               iconName = focused ? require("../../assets/home2.png") : require("../../assets/home.png");
-            } else if (route.name === 'Settings') {
+            } else if (route.name === 'Paramètres') {
               iconName = focused ? require("../../assets/settings2.png") : require("../../assets/settings.png");
-            } else if (route.name === 'Help') {
+            } else if (route.name === 'Aide') {
               iconName = focused ? require("../../assets/info2.png") : require("../../assets/info.png");
             }
 
@@ -53,20 +53,20 @@ export default function BottomNav() {
           },
         })}
         tabBarOptions={{
-          showLabel:false,
           keyboardHidesTabBar:true,
           style:{
             height:50
           },
+          activeTintColor:'white',
           tabStyle:{
             backgroundColor: '#283149',
             paddingBottom:2
           }
         }}
       >     
-      <Tab.Screen name="Help" component={HelpScreen} />
-      <Tab.Screen name="Home" component={HomeStackScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Aide" component={HelpScreen} />
+      <Tab.Screen name="Accueil" component={HomeStackScreen} />
+      <Tab.Screen name="Paramètres" component={SettingsScreen} />
     </Tab.Navigator>
   </NavigationContainer>
   );

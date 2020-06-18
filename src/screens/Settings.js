@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import colors from '../static/color'
-import { Button, Divider } from 'react-native-elements';
+import { Button, Divider, Overlay } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
 import { addcamp, reset } from '../redux/campsApp'
 import * as query from "../services/storeNewTransaction"
@@ -9,12 +9,19 @@ import * as Print from 'expo-print';
 import * as MediaLibrary from 'expo-media-library';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system'
-import {createPdf} from '../services/createPdf'
+import { createPdf } from '../services/createPdf'
+import Icons from 'react-native-vector-icons/AntDesign';
+
+//import LottieView from "lottie-react-native";
+
 
 export default function Settings({ navigation }) {
 
   const [name, setName] = useState(null);
   const [amount, setAmount] = useState(null);
+  const [pdfDownload, setDownloading] = useState(false);
+  const [created, setCreated] = useState(false);
+  //const animation = useRef(null);
 
   const dispatch = useDispatch()
   const campsRedux = useSelector(state => state);
@@ -23,12 +30,12 @@ export default function Settings({ navigation }) {
 
 
   console.log(campsRedux.camp);
-  
+
   const storeCampInfos = async function () {
     const campSql = { name: name, solde: amount };
     //insert sql, on attends -> insertion redux 
     const resp = await query.insertCamp(campSql);
-    const campRedux = { id: resp, name: name, solde: amount, soldeInitial:amount, caution:0 };
+    const campRedux = { id: resp, name: name, solde: amount, soldeInitial: amount, caution: 0 };
     addCamp(campRedux);
   }
 
@@ -43,34 +50,34 @@ export default function Settings({ navigation }) {
   }
 
   const downloadResume = async function () {
-      //todo
-  
-      const response = await Print.printToFileAsync({
-        html: await createPdf(),
-        base64:true
-      })
-
+    //animation.current.play();
+    //todo
+    setDownloading(true);
+    //console.log("on commence");
+    
+    const response = await Print.printToFileAsync({
+      html: await createPdf(),
+      base64: true
+    })
+    //console.log("pdf créé");
     // this changes the bit after the last slash of the uri (the document's name) to "invoice_<date of transaction"
-      
-      const newName = response.uri.slice(0, response.uri.lastIndexOf('/'))+"/invoice.pdf"
 
-    const pdfName = `${response.uri.slice(0,
-        response.uri.lastIndexOf('/') + 1
-        )}invoice.pdf`
+    const newName = response.uri.slice(0, response.uri.lastIndexOf('/')) + "/comptabilité.pdf"
 
-        await FileSystem.copyAsync({
-            from: response.uri,
-            to: newName,
-        })        
-      
-        
-      if(getLocationAsync()){
-        MediaLibrary.saveToLibraryAsync(newName);
-      }
-      
-      }
+    await FileSystem.copyAsync({
+      from: response.uri,
+      to: newName,
+    })
+    //console.log("copier nouveau fichier");
+    if (getLocationAsync()) {
+      await MediaLibrary.saveToLibraryAsync(newName);
+    }
+    //console.log("save to library");
+    setCreated(true);
+    
+  }
 
-      
+
 
   const nouveauCamp = async () => {
     //drop all and create + vider store
@@ -94,16 +101,16 @@ export default function Settings({ navigation }) {
           <Text style={styles.genTitle}>Paramètres</Text>
         </View>
         <View style={styles.containerGenInput1}>
-          <TextInput editable={campsRedux.camp.name ? false : true} 
-                     style={styles.textAmount} onChangeText={(value) => updateName(value)} 
-                     placeholder="Nom du camp" >{campsRedux.camp.name ? campsRedux.camp.name:""}         
-         </TextInput>
+          <TextInput editable={campsRedux.camp.name ? false : true}
+            style={styles.textAmount} onChangeText={(value) => updateName(value)}
+            placeholder="Nom du camp" >{campsRedux.camp.name ? campsRedux.camp.name : ""}
+          </TextInput>
         </View>
         <View style={styles.containerGenInput2}>
           <TextInput editable={campsRedux.camp.name ? false : true}
-                     keyboardType="number-pad"
-                     style={styles.textAmount} onChangeText={(value) => updateSolde(value)} 
-                     placeholder="Solde initial">{campsRedux.camp.soldeInitial ? campsRedux.camp.soldeInitial:""} 
+            keyboardType="number-pad"
+            style={styles.textAmount} onChangeText={(value) => updateSolde(value)}
+            placeholder="Solde initial">{campsRedux.camp.soldeInitial ? campsRedux.camp.soldeInitial : ""}
           </TextInput>
         </View>
         <View style={styles.containerGenInput2}>
@@ -123,6 +130,7 @@ export default function Settings({ navigation }) {
         </View>
         <View style={styles.containerGenInput3}>
           <Button
+            disabled={campsRedux.camp.name?false:true}
             title="Télécharger le résumé"
             type="outline"
             buttonStyle={styles.buttonGen}
@@ -141,6 +149,28 @@ export default function Settings({ navigation }) {
           onPress={() => nouveauCamp()}
         />
       </View>
+      <Overlay backdropStyle={styles.overLayBg} overlayStyle={{borderWidth:0, width:"80%",height:200}} isVisible={pdfDownload}>       
+        {created ? 
+        <View style={{flex:1, alignItems:'flex-end'}}>
+          <View style={{flex:1}}>
+            <TouchableWithoutFeedback onPress={()=> {setDownloading(false); setCreated(false)}}><Icons name="closecircle" size={25} color={colors.DARK_PRIMARY} /></TouchableWithoutFeedback>
+          </View>
+          
+        <View style={{alignItems:'center',justifyContent:'center', flex:8,padding:15}}>
+            <Icons name="check" size={35} color={colors.GREEN} />
+            <Text style={{textAlign:'center', paddingTop:25}} >Le pdf a bien été créé, vous pourrez le retrouver dans vos documents.</Text>
+        </View></View>
+        :
+        
+        
+        <View style={{alignItems:'center', flex:1,padding:15}}>
+        <Text style={{textAlign:'center', marginBottom:40}} >Merci de patienter durant la création du rapport.</Text>
+        <ActivityIndicator size="large" color={colors.GREEN} />
+        </View>
+        
+        }    
+        
+        </Overlay>
     </ScrollView>
   );
 }
@@ -156,6 +186,9 @@ const styles = StyleSheet.create({
   },
   containerParam: {
     height: 275,
+  },
+  overLayBg:{
+    backgroundColor: 'rgba(0,0,0,0.6)'
   },
   containerGenTitle: {
     flex: 2,

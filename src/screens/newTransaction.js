@@ -24,7 +24,7 @@ export default function componentName({ navigation: { goBack } }) {
   //0 = débit, 1 = crédit
   const [newSolde, setNewSolde] = useState(0);
   const [typeTransaction, setTransaction] = useState(0);
-  const [montant, setMontant] = useState(0);
+  const [montant, setMontant] = useState();
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("null");
   const [devise, setDevise] = useState(0);
@@ -199,6 +199,10 @@ export default function componentName({ navigation: { goBack } }) {
       toggleOverlay();
       setTransactionValid(!transactionValid);
       setCaution(false);
+      setMontant();
+      setImage("null");
+      setDescription("");
+      setAccepted(false);
   }
   const endOfGoBack = async function(){
       await toggleOverlay();
@@ -295,11 +299,11 @@ export default function componentName({ navigation: { goBack } }) {
 
 
           {/* Input description */}
-          <TextInput type="number" style={styles.textAmount} onC onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
+          <TextInput type="number" style={styles.textAmount} value={description} onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
 
           {/* Input container montant + devise */}
           <View style={styles.containerAmountCurr}>
-            <TextInput style={styles.textAmountMontant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
+            <TextInput style={styles.textAmountMontant} value={montant} onChangeText={(value) => updateMontant(value)} keyboardType="number-pad" placeholder="Montant"></TextInput>
             <View style={styles.textAmountCurr}>
               <Picker
                 selectedValue={devise}
@@ -344,12 +348,12 @@ export default function componentName({ navigation: { goBack } }) {
             containerStyle={{ width: '100%', marginLeft: 0 }}
           />
         </View>
-        <Overlay backdropStyle={styles.overLayBg} overlayStyle={{borderRadius:15}} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
+        <Overlay backdropStyle={styles.overLayBg} overlayStyle={{backgroundColor:colors.LIGHT_PRIMARY}} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
 
           {transactionValid ? 
             
-            <View style={{ width: 275, height: 155, paddingHorizontal:10}}>
-              <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 15 }}>La transaction a bien été validée.</Text>
+            <View style={{ width: 275, height: 175, paddingHorizontal:10}}>
+              <Text style={{ textAlign: 'center', fontSize: 20,paddingTop:10, paddingBottom: 25, color:colors.LIGHT_WHITE }}>La transaction a bien été validée.</Text>
                 <Button
                   title="Nouvelle transaction"
                   type="outline"
@@ -368,8 +372,8 @@ export default function componentName({ navigation: { goBack } }) {
                 />        
             </View>
             :
-            <View style={{ width: 275, height: 100 }}>
-              <Text style={{ textAlign: 'center',alignItems:'flex-end', fontSize: 20,flex:1 }}>Confimer la transaction</Text>
+            <View style={{ width: 275, height: 110 }}>
+              <Text style={{ textAlign: 'center',alignItems:'flex-end',color:colors.LIGHT_WHITE,paddingTop:10, fontSize: 20,flex:1 }}>Confimer la transaction</Text>
               <View style={{ flexDirection: 'row',alignItems:'center', marginLeft: 15,flex:1 }}>
                 <Button
                   title="Oui"
@@ -408,7 +412,7 @@ const styles = StyleSheet.create({
     color: colors.CUS_WHITE
   },
   overLayBg:{
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.7)'
   },
   prevText: {
     fontSize: 18,
@@ -563,29 +567,29 @@ const styles = StyleSheet.create({
   },
   buttonOverlay: {
     borderColor: colors.GREEN,
-    borderWidth:2,
+    borderWidth:1.5,
     height: 40,
-    borderRadius:25,
+    borderRadius:15,
     width: 115,
   },
   buttonOverlay2: {
     borderColor: colors.RED,
-    borderWidth:2,
+    borderWidth:1.5,
     height: 40,
-    borderRadius:25,
+    borderRadius:15,
     width: 115,
   },
   buttonOverlayOk: {
     borderColor: colors.GREEN,
-    borderWidth:2,
+    borderWidth:1.5,
     height: 40,
-    borderRadius:25,
+    borderRadius:15,
     width:"100%"
   },
   buttonOverlayOk2: {
     borderColor: colors.RED,
-    borderWidth:2,
-    borderRadius:25,
+    borderWidth:1.5,
+    borderRadius:15,
     height: 40,
     width:"100%"
   },

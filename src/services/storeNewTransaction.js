@@ -121,11 +121,11 @@ export const insertTransaction = async function (transa) {
                                 const camp = results.rows.item(0);
                                 if (nbRows === 1) {
                                   resolve({ first: true, results: transactions, camp: camp })
-                                  console.log(transactions, " ", camp);
+                                  //console.log(transactions, " ", camp);
 
                                 } else {
                                   resolve({ first: false, results: transactions, camp: camp })
-                                  console.log(transactions, " ", camp);
+                                  //console.log(transactions, " ", camp);
 
                                 }
                               }
@@ -211,7 +211,7 @@ export const selectTransactionsForPdf = async function () {
   const db = SQLite.openDatabase('campsDB');
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
-      tx.executeSql('select * from transactions order by id desc', [],
+      tx.executeSql('select * from transactions order by id asc', [],
         (tx, results) => {
           let arr = []
           for (let i = 0; i < results.rows.length; i++) {

@@ -3,19 +3,16 @@ import { selectCamp, selectTransactionsForPdf } from "./storeNewTransaction"
 async function createPdf() {
 
     const camp = await selectCamp();
-    console.log(camp.rows.item(0));
+    //console.log(camp.rows.item(0));
     const { name, soldeInitial, solde } = camp.rows.item(0);
 
     const transactions = await selectTransactionsForPdf();
     //console.log(transactions);
     let html = `<style>
-    @page {
-      margin: 20px;
-    }
     .transa {
         display: flex;
         flex-direction:row;
-        height:250px
+        height:10cm;
     }
     .box {
         flex:1;
@@ -25,16 +22,16 @@ async function createPdf() {
         margin:auto;
       }
     .transaTitle {
-        height:50px;
+        height:2cm;
         text-align: center;
     }
     .pres {
-        height:120px;
-        margin-top:50px;
+        height:5cm;
         text-align: center;
+        padding-top:2.5cm
     }
     .soldeIni {
-        height:80px;
+        height:2cm;
     }
     .divider {
         height:1px;
@@ -48,22 +45,22 @@ async function createPdf() {
         background-color:black;
         width:50%;
         margin:auto;
-        margin-top:30px;
-        margin-bottom:30px;
+        margin-top:60px;
+        margin-bottom:60px;
     }
     .infoTransa1 {
-        height:50px;
+        height:2cm;
     }
     .infoTransa2 {
-        height:125px; 
+        height:6cm; 
         box-sizing: border-box;
         width: 90%;
         border: solid black 1px;
-        padding-left: 15px;
-        padding-top:20px
+        padding-left: 3cm;
+        padding-top:1.6cm
      }
     .infoTransa3 {
-        height:50px;
+        height:2cm;
     }
     </style>
     <html>
@@ -90,9 +87,14 @@ async function createPdf() {
 
     let soldeHisto=soldeInitial;
     for (let i = 0; i < transactions.length; i++) {
-
+        let soldeCalc;
+        if(transactions[i].typeTransaction === 1){
+            soldeCalc =soldeHisto/1+transactions[i].montant/1;
+        }else{
+            soldeCalc =soldeHisto-transactions[i].montant;
+        }
         const dateFormat = new Date(transactions[i].date).toLocaleDateString();
-        let soldeCalc =soldeHisto-transactions[i].montant;
+        
         let transa = `
                 <div class="transa">
                     <div class="box">
@@ -122,7 +124,7 @@ async function createPdf() {
                         </div>          
                     </div>
                     <div class="boxImage">
-                        <img style="height:250px" src="data:image/png;base64, ${transactions[i].image}" />
+                        <img style="height:378px" src="data:image/png;base64, ${transactions[i].image}" />
                     </div>
                 </div>
                 <div class="divider2"></div>
