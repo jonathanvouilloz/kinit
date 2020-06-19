@@ -46,11 +46,11 @@ export default function componentName({ navigation: { goBack } }) {
 
 
   useEffect(() => {
-    const newSolde = calcNewSolde(typeTransaction, montant);
+    calcNewSolde(typeTransaction, montant);
   }, [typeTransaction])
 
   useEffect(() => {
-    const newSolde = calcNewSolde(typeTransaction, montant);
+    calcNewSolde(typeTransaction, montant);
   }, [montant])
 
   const updateType = function (type) {
@@ -71,7 +71,7 @@ export default function componentName({ navigation: { goBack } }) {
         setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
         break;
       case 1:
-        setNewSolde(parseFloat(campsRedux.camp.solde + montantA/1).toFixed(2))
+        setNewSolde(parseFloat(campsRedux.camp.solde/1 + montantA/1).toFixed(2))
         break;
       default:
         setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
@@ -245,7 +245,7 @@ export default function componentName({ navigation: { goBack } }) {
 
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 400 } }],
+      [{ resize: { height: 350 } }],
       { compress: 1, format: ImageManipulator.SaveFormat.JPG, base64: true }, {
       base64: true
     }
@@ -269,7 +269,7 @@ export default function componentName({ navigation: { goBack } }) {
         </View>
 
         <View style={styles.containerSolde}>
-          <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde : "-"} CHF</Text>
+          <Text style={styles.textSolde}>{campsRedux.camp.solde ? parseFloat(campsRedux.camp.solde).toFixed(2) : "0"} CHF</Text>
         </View>
 
         {/* Container des input */}
@@ -317,13 +317,15 @@ export default function componentName({ navigation: { goBack } }) {
           </View>
 
           <View style={styles.containerPrev}>
-            <Text style={styles.prevText}>{campsRedux.camp.solde}</Text>
+            <Text style={styles.prevText}>{parseFloat(campsRedux.camp.solde).toFixed(2)}</Text>
             <Text style={[styles.prevTextType, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{typeTransaction == 1 ? "+" : "-"}</Text>
             <Text style={[styles.prevText, { color: typeTransaction == 1 ? colors.GREEN : colors.RED }]}>{montant}</Text>
             <Text style={styles.prevTextRes}>= {newSolde}</Text>
           </View>
 
-
+          {accepted ? <View style={{ height: 200, paddingBottom: 15 }}>
+            <Image source={{ uri: `data:image/gif;base64,${image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
+          </View> : <View />}
           {/* Input ticket a upload */}
           <TouchableWithoutFeedback onPress={() => pickImage()}>
             <View style={styles.button}>
@@ -334,9 +336,6 @@ export default function componentName({ navigation: { goBack } }) {
               />
             </View>
           </TouchableWithoutFeedback>
-          {accepted ? <View style={{ height: 200, paddingTop: 15 }}>
-            <Image source={{ uri: `data:image/gif;base64,${image}` }} style={{ flex: 1, width: undefined, height: undefined, borderRadius: 25 }} resizeMode="contain" />
-          </View> : <View />}
         </View>
         <View style={styles.ContainerButtonAccept}>
           <Button

@@ -35,7 +35,7 @@ export default function BottomNav() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="Accueil"
         backBehavior="initalRoute" 
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {

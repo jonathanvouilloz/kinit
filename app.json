@@ -1,17 +1,16 @@
 {
   "expo": {
-    "name": "KeritoApp",
-    "slug": "KeritoApp",
+    "name": "Kinit",
+    "slug": "kinit-app",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/mipmap-xxxhdpi/ic_launcher.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash3.png",
       "resizeMode": "contain",
       "backgroundColor": "#283149"
     },
@@ -19,10 +18,15 @@
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.vouillozJonathan.kinit",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.vouillozJonathan.kinit",
+      "versionCode": 1
     }
   }
 }

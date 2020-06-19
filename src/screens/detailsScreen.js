@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
@@ -32,8 +32,45 @@ export default function componentName({navigation: { goBack }, route }) {
         setLoaded(true);
     }
 
+    const delTransa = function(){
+
+        Alert.alert(
+            "Supprimer la transaction",
+            "Êtes-vous sûr de vouloir annuler la transaction ? L'opération est irréversible",
+            [
+              {
+                text: "Oui",
+                onPress: () => del(),  
+              },
+              { text: "Annuler", onPress: () => {return}, style: "cancel"}
+            ],
+            { cancelable: false }
+          );
+
+
+    }
+
+    const del = async function(){
+    
+        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, true, route.params.item.typeTransaction);
+        let newSolde;
+        if(caution){
+            addAllTransa(caution);
+            if(route.params.item.typeTransaction===1){
+                newSolde = campsRedux.camp.solde/1-route.params.item.montant/1;
+            }else{
+                newSolde = campsRedux.camp.solde/1+route.params.item.montant/1;
+            }
+            const campUpdated = { id: campsRedux.camp.id, name: campsRedux.camp.name, solde: newSolde, soldeInitial: campsRedux.camp.soldeInitial, caution: campsRedux.camp.caution};
+            addCamp(campUpdated);
+          } 
+        goBack();
+    }
+
     const updateCaution = async function(){
-        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde);
+        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, false, 2);
+        console.log(caution );
+        
         if(caution){
             addAllTransa(caution);
             let newCaution = campsRedux.camp.caution/1-route.params.item.montant/1;
@@ -88,13 +125,6 @@ export default function componentName({navigation: { goBack }, route }) {
             }
                     </View>
             <View style={styles.saveContainer}>
-                <Button
-                    title="Sauvegarder"
-                    type="outline"
-                    buttonStyle={styles.button}
-                    titleStyle={styles.buttonTitle}
-                    containerStyle={{ width: '100%', marginLeft: 0, marginBottom:10 }}
-                />
                 {transa.typeTransaction === 2 ?
                 <Button
                     title="Caution récupérée"
@@ -104,7 +134,14 @@ export default function componentName({navigation: { goBack }, route }) {
                     titleStyle={styles.buttonTitleV2}
                     containerStyle={{ width: '100%', marginLeft: 0 }}
                 />:
-                <View />
+                <Button
+                    title="Supprimer la transaction"
+                    type="outline"
+                    onPress={()=>delTransa()}
+                    buttonStyle={styles.button}
+                    titleStyle={styles.buttonTitle}
+                    containerStyle={{ width: '100%', marginLeft: 0, marginBottom:10 }}
+                />
                 }
             </View>
             </View>

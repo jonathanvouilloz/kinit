@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, TouchableWithoutFeedback, ToastAndroid } from 'react-native';
 import colors from '../static/color'
 import { Button, Divider, Overlay } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,6 +37,14 @@ export default function Settings({ navigation }) {
     const resp = await query.insertCamp(campSql);
     const campRedux = { id: resp, name: name, solde: amount, soldeInitial: amount, caution: 0 };
     addCamp(campRedux);
+
+    ToastAndroid.showWithGravityAndOffset(
+      "Le camp a bien été ajouté !",
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0,
+      50
+    );
   }
 
   async function getLocationAsync() {
@@ -50,6 +58,8 @@ export default function Settings({ navigation }) {
   }
 
   const downloadResume = async function () {
+
+    
     //animation.current.play();
     //todo
     setDownloading(true);
@@ -93,6 +103,13 @@ export default function Settings({ navigation }) {
   const updateSolde = function (val) {
     setAmount(val)
   };
+
+  const finishPdf = function(){
+    console.log("ici");
+    
+    setCreated(false);
+    setDownloading(false);
+  }
 
   return (
     <ScrollView style={styles.main}>
@@ -153,7 +170,7 @@ export default function Settings({ navigation }) {
         {created ? 
         <View style={{flex:1, alignItems:'flex-end'}}>
           <View style={{flex:1}}>
-            <TouchableWithoutFeedback onPress={()=> {setDownloading(false); setCreated(false)}}><Icons name="closecircle" size={25} color={colors.DARK_PRIMARY} /></TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={()=> finishPdf()}><Icons name="closecircle" size={25} color={colors.DARK_PRIMARY} /></TouchableWithoutFeedback>
           </View>
           
         <View style={{alignItems:'center',justifyContent:'center', flex:8,padding:15}}>

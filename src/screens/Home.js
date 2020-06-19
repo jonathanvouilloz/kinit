@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { selectCamp, selectTransactions } from '../services/storeNewTransaction'
 import { addcamp, addalltransa } from '../redux/campsApp'
 
-
 export default function Home({ navigation }) {
 
   const campsRedux = useSelector(state => state);
@@ -18,12 +17,12 @@ export default function Home({ navigation }) {
   const addCamp = camp => dispatch(addcamp(camp))
   const addAllTransa = theArray => dispatch(addalltransa(theArray))
 
-
   useEffect(() => {
     getInitialData();
   }, [])
 
   const getInitialData = async function () {
+
     const camps = await selectCamp();
     const transactions = await selectTransactions();
 
@@ -42,10 +41,7 @@ export default function Home({ navigation }) {
     }
     if(transactions){
       addAllTransa(transactions)
-    }
-
-    
-    
+    }    
   }
 
   const goToAddNewTransactions = function(){
@@ -69,8 +65,8 @@ export default function Home({ navigation }) {
         <Text style={styles.title}>{campsRedux.camp.name ? campsRedux.camp.name : "Aucun camp actif"}</Text>
       </View>
       <View style={styles.containerSolde}>
-        <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde : "-"} CHF</Text>
-        <Text style={styles.textCaution}>{campsRedux.camp.caution ? "dont CHF "+campsRedux.camp.caution +" de caution" : ""}</Text>
+        <Text style={styles.textSolde}>{campsRedux.camp.solde ? parseFloat(campsRedux.camp.solde).toFixed(2) : "0"} CHF</Text>
+        <Text style={styles.textCaution}>{campsRedux.camp.caution ? "dont CHF "+parseFloat(campsRedux.camp.caution).toFixed(2) +" de caution" : ""}</Text>
       </View>
       <View style={styles.containerAddTransactions}>
         <TouchableWithoutFeedback onPress={()=>goToAddNewTransactions()}>
@@ -126,7 +122,7 @@ const styles = StyleSheet.create({
   textCaution: {
     textAlign: 'right',
     fontSize: 14,
-    color: "#C8C8C8"
+    color: colors.ORANGE
   },
   containerAddTransactions: {
     flex: 1,

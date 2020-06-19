@@ -84,7 +84,7 @@ export const insertTransaction = async function (transa) {
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql('INSERT INTO transactions (name, montant, currency, image, date, typeTransaction, camp_id) VALUES (?,?,?,?,?,?,?)',
-        [transa.name, transa.montant, transa.currency, transa.image, date, transa.typeTransaction, transa.idCamp],
+        [transa.name, parseFloat(transa.montant).toFixed(2), transa.currency, transa.image, date, transa.typeTransaction, transa.idCamp],
         (tx, results) => {
 
           db.transaction(function (tx) {
@@ -257,12 +257,24 @@ export const selectTransaction = async function (id) {
 }
 
 
-export const recupCaution = async function (id, montant, solde) {
+
+export const recupCaution = async function (id, montant, solde, deleteOrCaution, typeTransaction) {
+
+  let updateSolde;
+  if(deleteOrCaution){
+    if(typeTransaction===1){
+      updateSolde = solde / 1 - montant / 1;
+    }else{
+      updateSolde = solde / 1 + montant / 1;
+    }
+  }else{
+    updateSolde = solde / 1 - montant / 1
+  }
 
   const db = SQLite.openDatabase('campsDB');
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
-      tx.executeSql('update camp set solde = ?', [solde / 1 + montant / 1],
+      tx.executeSql('update camp set solde = ?', [updateSolde],
         (tx, results) => {
           tx.executeSql("delete from transactions where id = ?", [id]),
             tx.executeSql('select * from transactions order by id desc', [],
