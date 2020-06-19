@@ -11,6 +11,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { insertTransaction } from "../services/storeNewTransaction"
 import { addtransa, addtransafirst, addcamp } from '../redux/campsApp'
 import { useDispatch, useSelector } from 'react-redux'
+import LottView from "../components/lottietes"
 
 
 
@@ -347,13 +348,15 @@ export default function componentName({ navigation: { goBack } }) {
             containerStyle={{ width: '100%', marginLeft: 0 }}
           />
         </View>
-        <Overlay backdropStyle={styles.overLayBg} overlayStyle={{backgroundColor:colors.LIGHT_PRIMARY}} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
+        <Overlay backdropStyle={styles.overLayBg} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
 
           {transactionValid ? 
             
-            <View style={{ width: 275, height: 175, paddingHorizontal:10}}>
-              <Text style={{ textAlign: 'center', fontSize: 20,paddingTop:10, paddingBottom: 25, color:colors.LIGHT_WHITE }}>La transaction a bien été validée.</Text>
-                <Button
+            <View style={{ width: 275, height: 285, paddingHorizontal:10}}>
+              <Text style={{ textAlign: 'center', fontSize: 18,paddingTop:5 }}>Transaction validée !</Text>
+              <View style={{alignItems:'center',justifyContent:'flex-start'}}><LottView loop={false} size={140} src={require('../../assets/wallet.json')} /></View>
+              <View style={{paddingBottom:5, marginTop:25}}>
+              <Button
                   title="Nouvelle transaction"
                   type="outline"
                   onPress={() => endOfContinue()}
@@ -368,11 +371,13 @@ export default function componentName({ navigation: { goBack } }) {
                   buttonStyle={styles.buttonOverlayOk2}
                   titleStyle={styles.buttonSaveTitleOk2}
 
-                />        
+                /> 
+              </View>
+                       
             </View>
             :
-            <View style={{ width: 275, height: 110 }}>
-              <Text style={{ textAlign: 'center',alignItems:'flex-end',color:colors.LIGHT_WHITE,paddingTop:10, fontSize: 20,flex:1 }}>Confimer la transaction</Text>
+            <View style={{ width: 285, height: 110 }}>
+              <Text style={{ textAlign: 'center',alignItems:'flex-end',paddingTop:10, fontSize: 20,flex:1 }}>Confimer la transaction?</Text>
               <View style={{ flexDirection: 'row',alignItems:'center', marginLeft: 15,flex:1 }}>
                 <Button
                   title="Oui"

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, ActivityIndicator, TouchableWithoutFeedback, ToastAndroid } from 'react-native';
 import colors from '../static/color'
 import { Button, Divider, Overlay } from 'react-native-elements';
@@ -11,8 +11,7 @@ import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system'
 import { createPdf } from '../services/createPdf'
 import Icons from 'react-native-vector-icons/AntDesign';
-
-//import LottieView from "lottie-react-native";
+import LottieAnimValid from "../components/lottietes"
 
 
 export default function Settings({ navigation }) {
@@ -21,7 +20,6 @@ export default function Settings({ navigation }) {
   const [amount, setAmount] = useState(null);
   const [pdfDownload, setDownloading] = useState(false);
   const [created, setCreated] = useState(false);
-  //const animation = useRef(null);
 
   const dispatch = useDispatch()
   const campsRedux = useSelector(state => state);
@@ -60,7 +58,6 @@ export default function Settings({ navigation }) {
   const downloadResume = async function () {
 
     
-    //animation.current.play();
     //todo
     setDownloading(true);
     //console.log("on commence");
@@ -173,16 +170,17 @@ export default function Settings({ navigation }) {
             <TouchableWithoutFeedback onPress={()=> finishPdf()}><Icons name="closecircle" size={25} color={colors.DARK_PRIMARY} /></TouchableWithoutFeedback>
           </View>
           
-        <View style={{alignItems:'center',justifyContent:'center', flex:8,padding:15}}>
-            <Icons name="check" size={35} color={colors.GREEN} />
-            <Text style={{textAlign:'center', paddingTop:25}} >Le pdf a bien été créé, vous pourrez le retrouver dans vos documents.</Text>
+        <View style={{alignItems:'center',justifyContent:'center', flex:9,paddingBottom:25}}>
+            <LottieAnimValid loop={false} src={require('../../assets/data.json')} size={100} />
+            <Text style={{textAlign:'center'}} >Le pdf a bien été créé, vous pourrez le retrouver dans vos documents.</Text>
         </View></View>
         :
         
         
         <View style={{alignItems:'center', flex:1,padding:15}}>
-        <Text style={{textAlign:'center', marginBottom:40}} >Merci de patienter durant la création du rapport.</Text>
-        <ActivityIndicator size="large" color={colors.GREEN} />
+          <LottieAnimValid loop={true} src={require('../../assets/creating.json')} size={100} />
+        <Text style={{textAlign:'center', paddingTop:10}} >Merci de patienter durant la création du rapport.</Text>
+        
         </View>
         
         }    
