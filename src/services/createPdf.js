@@ -16,13 +16,15 @@ async function createPdf() {
     }
     .box {
         flex:1;
+        height:10cm;
       }
       .boxImage {
         flex:1;
+        height:10cm;
         margin:auto;
       }
     .transaTitle {
-        height:2cm;
+        height:3cm;
         text-align: center;
     }
     .pres {
@@ -31,7 +33,7 @@ async function createPdf() {
         padding-top:1.5cm
     }
     .soldeIni {
-        height:2cm;
+        height:3cm;
     }
     .divider {
         height:1px;
@@ -124,7 +126,7 @@ async function createPdf() {
                         </div>          
                     </div>
                     <div class="boxImage">
-                        <img style="height:350px" src="data:image/png;base64, ${transactions[i].image}" />
+                        <img style="height:100%; width:auto" src="data:image/png;base64, ${transactions[i].image}" />
                     </div>
                 </div>
                 <div class="divider2"></div>

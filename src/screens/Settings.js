@@ -16,8 +16,8 @@ import LottieAnimValid from "../components/lottietes"
 
 export default function Settings({ navigation }) {
 
-  const [name, setName] = useState(null);
-  const [amount, setAmount] = useState(null);
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState(0);
   const [pdfDownload, setDownloading] = useState(false);
   const [created, setCreated] = useState(false);
 
@@ -26,10 +26,24 @@ export default function Settings({ navigation }) {
   const addCamp = camp => dispatch(addcamp(camp))
   const resetAll = () => dispatch(reset())
 
-
-  console.log(campsRedux.camp);
-
   const storeCampInfos = async function () {
+
+
+    const amountA = amount;
+    const nameA = name;
+    
+    if(amountA === undefined|| nameA === undefined || nameA === "" || amountA === 0 || nameA === "" || amountA === ""){
+      ToastAndroid.showWithGravityAndOffset(
+        "Merci de remplir les deux champs",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        0,
+        50
+      );
+      return
+    }
+    
+
     const campSql = { name: name, solde: amount };
     //insert sql, on attends -> insertion redux 
     const resp = await query.insertCamp(campSql);
@@ -60,13 +74,11 @@ export default function Settings({ navigation }) {
     
     //todo
     setDownloading(true);
-    //console.log("on commence");
     
     const response = await Print.printToFileAsync({
       html: await createPdf(),
       base64: true
     })
-    //console.log("pdf créé");
     // this changes the bit after the last slash of the uri (the document's name) to "invoice_<date of transaction"
 
     const newName = response.uri.slice(0, response.uri.lastIndexOf('/')) + "/comptabilité.pdf"
@@ -75,11 +87,9 @@ export default function Settings({ navigation }) {
       from: response.uri,
       to: newName,
     })
-    //console.log("copier nouveau fichier");
     if (getLocationAsync()) {
       await MediaLibrary.saveToLibraryAsync(newName);
     }
-    //console.log("save to library");
     setCreated(true);
     
   }
@@ -101,9 +111,7 @@ export default function Settings({ navigation }) {
     setAmount(val)
   };
 
-  const finishPdf = function(){
-    console.log("ici");
-    
+  const finishPdf = function(){    
     setCreated(false);
     setDownloading(false);
   }
