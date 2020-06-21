@@ -23,7 +23,9 @@ export default function Home({ navigation }) {
   const getInitialData = async function () {
 
     const camps = await selectCamp();
+    console.log(camps);
     const transactions = await selectTransactions();
+    console.log(transactions);
 
     let sousCaution = 0;
     for(let i = 0;i<transactions.length;i++){
@@ -31,15 +33,17 @@ export default function Home({ navigation }) {
         sousCaution = sousCaution + transactions[i].montant
       }
     }
-    
     if (camps) {
-      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial, caution:parseFloat(sousCaution).toFixed(2) };
+      const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial, caution:parseFloat(sousCaution).toFixed(2)};
       addCamp(campRedux);
     }
     if(transactions){
       addAllTransa(transactions)
     }    
   }
+
+  
+  
 
   const goToAddNewTransactions = function(){
     if (!campsRedux.camp.name) {

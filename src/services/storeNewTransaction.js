@@ -222,7 +222,7 @@ export const selectTransactionsForPdf = async function () {
               currency: results.rows.item(i).currency,
               date: results.rows.item(i).date,
               typeTransaction: results.rows.item(i).typeTransaction,
-              image:results.rows.item(i).image,
+              image: results.rows.item(i).image,
             };
             arr.push(transa);
           }
@@ -261,15 +261,16 @@ export const selectTransaction = async function (id) {
 export const recupCaution = async function (id, montant, solde, deleteOrCaution, typeTransaction) {
 
   let updateSolde;
-  if(deleteOrCaution){
-    if(typeTransaction===1){
+  if (!deleteOrCaution) {
+    if (typeTransaction === 1) {
       updateSolde = solde / 1 - montant / 1;
-    }else{
+    } else {
       updateSolde = solde / 1 + montant / 1;
     }
-  }else{
-    updateSolde = solde / 1 - montant / 1
+  } else {
+    updateSolde = solde / 1 + montant / 1
   }
+
 
   const db = SQLite.openDatabase('campsDB');
   return new Promise((resolve, reject) => {
@@ -291,11 +292,7 @@ export const recupCaution = async function (id, montant, solde, deleteOrCaution,
                   };
                   arr.push(transa);
                 }
-                if (results.rows.length > 0) {
-                  resolve(arr);
-                } else {
-                  resolve(false);
-                }
+                resolve(arr);
               }
             )
         }

@@ -125,10 +125,10 @@ export default function componentName({ navigation: { goBack } }) {
       type = 2;
     } else if (typeTransaction === 0) {
       type = 0;
-
     } else {
       type = 1;
     }
+
     const transa = {
       typeTransaction: type,
       name: description,
@@ -139,6 +139,8 @@ export default function componentName({ navigation: { goBack } }) {
     }
     //insert transactions
     const lastInsert = await insertTransaction(transa);
+    
+
     //add derniere transa dans le store 
     const insertTransaRedux = {
       id: lastInsert.results.id,
@@ -155,8 +157,6 @@ export default function componentName({ navigation: { goBack } }) {
     } else {
       addTransa(insertTransaRedux); 
     }
-
-
 
     const cautionUpdated = parseFloat(campsRedux.camp.caution).toFixed(2)/1 + parseFloat(montant).toFixed(2)/1;
 

@@ -46,13 +46,13 @@ export default function componentName({navigation: { goBack }, route }) {
             ],
             { cancelable: false }
           );
-
-
     }
 
     const del = async function(){
-    
-        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, true, route.params.item.typeTransaction);
+        
+        
+        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, false, route.params.item.typeTransaction);
+
         let newSolde;
         if(caution){
             addAllTransa(caution);
@@ -68,8 +68,9 @@ export default function componentName({navigation: { goBack }, route }) {
     }
 
     const updateCaution = async function(){
-        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, false, 2);
-        console.log(caution );
+
+        const caution = await recupCaution(route.params.item.id, route.params.item.montant, campsRedux.camp.solde, true, 2);
+        console.log("caution ", caution);
         
         if(caution){
             addAllTransa(caution);
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
         borderRadius: 25
     },
     buttonTitle: {
-        color: colors.GREEN
+        color: colors.RED
     },
     buttonV2: {
         borderColor: colors.ORANGE,
