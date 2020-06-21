@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.LIGHT_PRIMARY
     },
     button: {
-        borderColor: colors.GREEN,
+        borderColor: colors.RED,
         borderRadius: 25
     },
     buttonTitle: {
