@@ -449,17 +449,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 15
   },
-  saveContainer: {
-    flex: 1,
-    marginHorizontal: 15,
-    justifyContent: 'center'
-  },
   containerTransactions: {
     flex: 3,
     marginHorizontal: 15,
     paddingBottom: 15,
   },
-
   ContainerButtonAccept: {
     flex: 2,
     justifyContent: "flex-end",
@@ -471,13 +465,6 @@ const styles = StyleSheet.create({
     fontSize: 50,
     color: colors.GREEN
   },
-  containerDetails: {
-    flex: 1,
-    marginHorizontal: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row'
-  },
   goBack: {
     flex: 1
   },
@@ -485,32 +472,10 @@ const styles = StyleSheet.create({
     flex: 3,
     alignItems: 'center',
   },
-  updateTransa: {
-    flex: 1,
-  },
   typeTransa: {
     flex: 2,
   },
-  amountTransa: {
-    flex: 3,
-    paddingRight: 5,
-  },
-  textTypeTransa: {
-    fontSize: 20,
-    color: colors.CUS_WHITE
-  },
   textAmount: {
-    fontSize: 18,
-    borderRadius: 25,
-    color: colors.LIGHT_WHITE,
-    borderWidth: 1,
-    marginBottom: 15,
-    height: 40,
-    paddingLeft: 15,
-    borderColor: colors.LIGHT_PRIMARY,
-    backgroundColor: colors.LIGHT_PRIMARY
-  },
-  inputFile: {
     fontSize: 18,
     borderRadius: 25,
     color: colors.LIGHT_WHITE,
@@ -542,17 +507,6 @@ const styles = StyleSheet.create({
     marginRight: 5,
     borderColor: colors.LIGHT_PRIMARY,
     backgroundColor: colors.LIGHT_PRIMARY
-  },
-  transactionIndication: {
-    fontSize: 18,
-    borderRadius: 25,
-    color: colors.LIGHT_WHITE,
-    borderWidth: 1,
-    flex: 1,
-    height: 40,
-    borderColor: colors.DARK_PRIMARY,
-    alignItems: 'center',
-    justifyContent: 'center'
   },
   button: {
     borderColor: colors.LIGHT_PRIMARY,
@@ -605,13 +559,6 @@ const styles = StyleSheet.create({
   },
   buttonSaveTitleOk2: {
     color: colors.RED,
-  },
-  buttonTitle: {
-    color: colors.LIGHT_WHITE,
-    paddingRight: 15
-  },
-  buttonTypeTextStyle: {
-    fontSize: 40
   },
   buttonTypeStyle: {
     backgroundColor: colors.DARK_PRIMARY,

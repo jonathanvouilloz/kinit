@@ -128,14 +128,14 @@ export default function Settings({ navigation }) {
             placeholder="Nom du camp" >{campsRedux.camp.name ? campsRedux.camp.name : ""}
           </TextInput>
         </View>
-        <View style={styles.containerGenInput2}>
+        <View style={styles.containerGenInput1}>
           <TextInput editable={campsRedux.camp.name ? false : true}
             keyboardType="number-pad"
             style={styles.textAmount} onChangeText={(value) => updateSolde(value)}
             placeholder="Solde initial">{campsRedux.camp.soldeInitial ? campsRedux.camp.soldeInitial : ""}
           </TextInput>
         </View>
-        <View style={styles.containerGenInput2}>
+        <View style={styles.containerGenInput1}>
           <Button
             disabled={campsRedux.camp.soldeInitial ? true : false}
             title="Sauvegarder"
@@ -230,19 +230,8 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 30
   },
-  containerGenInput4: {
-    height: 50,
-    marginBottom: 30
-  },
-  containerGenInput2: {
-    height: 50,
-  },
   containerRecap: {
     height: 250,
-  },
-  containerReset: {
-    height: 200,
-    justifyContent: 'center'
   },
   textAmount: {
     fontSize: 18,

@@ -11,7 +11,6 @@ export default function Home({ navigation }) {
 
   const campsRedux = useSelector(state => state);
 
-
   //initial data for redux
   const dispatch = useDispatch()
   const addCamp = camp => dispatch(addcamp(camp))
@@ -36,8 +35,6 @@ export default function Home({ navigation }) {
     if (camps) {
       const campRedux = { id: camps.rows.item(0).id, name: camps.rows.item(0).name, solde: camps.rows.item(0).solde, soldeInitial: camps.rows.item(0).soldeInitial, caution:parseFloat(sousCaution).toFixed(2) };
       addCamp(campRedux);
-    }else{
-      console.log("pas de camp");  
     }
     if(transactions){
       addAllTransa(transactions)
@@ -65,7 +62,7 @@ export default function Home({ navigation }) {
         <Text style={styles.title}>{campsRedux.camp.name ? campsRedux.camp.name : "Aucun camp actif"}</Text>
       </View>
       <View style={styles.containerSolde}>
-        <Text style={styles.textSolde}>{campsRedux.camp.solde ? parseFloat(campsRedux.camp.solde).toFixed(2) : "0"} CHF</Text>
+        <Text style={styles.textSolde}>{campsRedux.camp.solde ? campsRedux.camp.solde: "0"} CHF</Text>
         <Text style={styles.textCaution}>{campsRedux.camp.caution ? "dont CHF "+parseFloat(campsRedux.camp.caution).toFixed(2) +" de caution" : ""}</Text>
       </View>
       <View style={styles.containerAddTransactions}>
@@ -116,12 +113,12 @@ const styles = StyleSheet.create({
   },
   textSolde: {
     textAlign: 'right',
-    fontSize: 50,
+    fontSize: 45,
     color: colors.GREEN
   },
   textCaution: {
     textAlign: 'right',
-    fontSize: 14,
+    fontSize: 11,
     color: colors.ORANGE
   },
   containerAddTransactions: {

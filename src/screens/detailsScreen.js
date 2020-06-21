@@ -185,11 +185,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         paddingTop: 15,
     },
-    textSolde: {
-        textAlign: 'right',
-        fontSize: 50,
-        color: colors.GREEN
-    },
     containerDetails: {
         height:100,
         marginHorizontal: 15,

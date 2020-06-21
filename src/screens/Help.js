@@ -6,7 +6,7 @@ import {Picker} from '@react-native-community/picker';
 
 
 export default function Help({ navigation }) {
-  const [selectedValue, setSelectedValue] = useState("java");
+  const [selectedValue, setSelectedValue] = useState("CPV");
 
 
 
@@ -27,8 +27,6 @@ export default function Help({ navigation }) {
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
           >
             <Picker.Item label="Centre Protestant de Vacances" value="CPV" />
-            <Picker.Item label="Caritas" value="CAR" />
-            <Picker.Item label="Vacances Nouvelles" value="VAC" />
           </Picker>
         </View>
       </View>
