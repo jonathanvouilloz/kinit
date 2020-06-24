@@ -77,7 +77,9 @@ export default function Settings({ navigation }) {
     
     const response = await Print.printToFileAsync({
       html: await createPdf(),
-      base64: true
+      base64: true,
+      width:1122,
+      height:793
     })
     // this changes the bit after the last slash of the uri (the document's name) to "invoice_<date of transaction"
 
