@@ -140,7 +140,7 @@ export default function Settings({ navigation }) {
         <View style={styles.containerGenInput1}>
           <Button
             disabled={campsRedux.camp.soldeInitial ? true : false}
-            title="Sauvegarder"
+            title="Commencer le camp"
             type="outline"
             buttonStyle={styles.buttonGen}
             titleStyle={styles.buttonGenTitle}

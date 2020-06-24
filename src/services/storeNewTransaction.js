@@ -75,7 +75,6 @@ export const insertCamp = async function (camp) {
 
 
 export const insertTransaction = async function (transa) {
-  const date = new Date().getTime();
   const db = SQLite.openDatabase('campsDB');
   let campUpdated;
   //montant a operér
@@ -84,7 +83,7 @@ export const insertTransaction = async function (transa) {
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql('INSERT INTO transactions (name, montant, currency, image, date, typeTransaction, camp_id) VALUES (?,?,?,?,?,?,?)',
-        [transa.name, parseFloat(transa.montant).toFixed(2), transa.currency, transa.image, date, transa.typeTransaction, transa.idCamp],
+        [transa.name, parseFloat(transa.montant).toFixed(2), transa.currency, transa.image, transa.date.getTime(), transa.typeTransaction, transa.idCamp],
         (tx, results) => {
 
           db.transaction(function (tx) {

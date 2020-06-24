@@ -101,7 +101,7 @@ export default function componentName({navigation: { goBack }, route }) {
             </View>
             <View style={styles.containerDetails}>
                 <View style={styles.typeTransa}>
-                    <Text style={styles.textTypeTransa}>{transa.typeTransaction === 0 ? "Débit de" : transa.typeTransaction === 1 ? "Crédit de:" : "Caution de"}</Text>
+                    <Text style={styles.textTypeTransa}>{transa.typeTransaction === 0 ? "Sortie de" : transa.typeTransaction === 1 ? "Entrée de:" : "Caution de"}</Text>
                 </View>
                 <View style={styles.amountTransa}>
                     <TextInput value={transa.montant.toString()} keyboardType="number-pad" style={styles.textAmount}></TextInput>

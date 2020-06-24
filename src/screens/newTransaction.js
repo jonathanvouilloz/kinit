@@ -12,6 +12,7 @@ import { insertTransaction } from "../services/storeNewTransaction"
 import { addtransa, addtransafirst, addcamp } from '../redux/campsApp'
 import { useDispatch, useSelector } from 'react-redux'
 import LottView from "../components/lottietes"
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
 
@@ -34,6 +35,11 @@ export default function componentName({ navigation: { goBack } }) {
   const [accepted, setAccepted] = useState(false);
   const [isModalValiation, setValidVisible] = useState(false);
   const [transactionValid, setTransactionValid] = useState(false);
+
+
+  //date 
+  const [date, setDate] = useState("null");
+  const [showDP, setShowDP] = useState(false);
 
 
   const buttons = [{ element: débit }, { element: crédit }]
@@ -61,7 +67,7 @@ export default function componentName({ navigation: { goBack } }) {
     }
   };
 
-  const toggleOverlay =  async () => {
+  const toggleOverlay = async () => {
     setValidVisible(!isModalValiation);
   };
 
@@ -72,13 +78,23 @@ export default function componentName({ navigation: { goBack } }) {
         setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
         break;
       case 1:
-        setNewSolde(parseFloat(campsRedux.camp.solde/1 + montantA/1).toFixed(2))
+        setNewSolde(parseFloat(campsRedux.camp.solde / 1 + montantA / 1).toFixed(2))
         break;
       default:
         setNewSolde(parseFloat(campsRedux.camp.solde - montantA).toFixed(2))
         break;
     }
   }
+
+  const handleConfirm = (date) => {
+    console.log("A date has been picked: ", date);
+    showDatepicker();
+    setDate(date)
+  };
+
+  const showDatepicker = () => {
+    setShowDP(!showDP);
+  };
 
   const storeData = async function () {
 
@@ -106,8 +122,20 @@ export default function componentName({ navigation: { goBack } }) {
       return
     }
 
+    if (date === "null") {
+      setValidVisible(!isModalValiation);
+      ToastAndroid.showWithGravityAndOffset(
+        'Merci de remplir une date',
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        50
+      );
+      return
+    }
 
-    
+
+
     if (image === "null" && !caution) {
       setValidVisible(!isModalValiation);
       ToastAndroid.showWithGravityAndOffset(
@@ -133,13 +161,14 @@ export default function componentName({ navigation: { goBack } }) {
       typeTransaction: type,
       name: description,
       montant: montant,
+      date: date,
       image: image,
       currency: devise,
       idCamp: 1,
     }
     //insert transactions
     const lastInsert = await insertTransaction(transa);
-    
+
 
     //add derniere transa dans le store 
     const insertTransaRedux = {
@@ -151,27 +180,27 @@ export default function componentName({ navigation: { goBack } }) {
       image: lastInsert.results.image,
       date: lastInsert.results.date
     }
-    
+
     if (lastInsert.first) {
       addTransaFirst(insertTransaRedux);
     } else {
-      addTransa(insertTransaRedux); 
+      addTransa(insertTransaRedux);
     }
 
-    const cautionUpdated = parseFloat(campsRedux.camp.caution).toFixed(2)/1 + parseFloat(montant).toFixed(2)/1;
+    const cautionUpdated = parseFloat(campsRedux.camp.caution).toFixed(2) / 1 + parseFloat(montant).toFixed(2) / 1;
 
-    if(caution){
+    if (caution) {
       const campUpdated = {
         id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial, caution: cautionUpdated
       }
       addCamp(campUpdated);
-    }else{
+    } else {
       const campUpdated = {
         id: lastInsert.camp.id, name: lastInsert.camp.name, solde: lastInsert.camp.solde, soldeInitial: campsRedux.camp.soldeInitial, caution: campsRedux.camp.caution
       }
       addCamp(campUpdated);
     }
-    
+
 
     setTransactionValid(!transactionValid);
 
@@ -196,18 +225,18 @@ export default function componentName({ navigation: { goBack } }) {
     }
   }
 
-  const endOfContinue = function(){
-      toggleOverlay();
-      setTransactionValid(!transactionValid);
-      setCaution(false);
-      setMontant();
-      setImage("null");
-      setDescription("");
-      setAccepted(false);
+  const endOfContinue = function () {
+    toggleOverlay();
+    setTransactionValid(!transactionValid);
+    setCaution(false);
+    setMontant();
+    setImage("null");
+    setDescription("");
+    setAccepted(false);
   }
-  const endOfGoBack = async function(){
-      await toggleOverlay();
-      goBack();
+  const endOfGoBack = async function () {
+    await toggleOverlay();
+    goBack();
   }
 
   useEffect(() => {
@@ -227,13 +256,13 @@ export default function componentName({ navigation: { goBack } }) {
       allowsEditing: true,
       quality: 1,
       base64: true,
-    },);
+    });
 
     if (!result.cancelled) {
       setImage(result.uri);
       setAccepted(true);
       _resizeImage(result.uri);
-    }else{
+    } else {
       setImage("null");
       setAccepted(false);
 
@@ -297,7 +326,18 @@ export default function componentName({ navigation: { goBack } }) {
             <Text style={styles.cautionText}>Argent gelé / Caution</Text>
 
           </View>
-
+          <View style={styles.dateContainer}>
+            <DateTimePickerModal
+              isVisible={showDP}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={showDatepicker}
+            />
+              <TextInput type="number" style={styles.textAmountDate} value={date !== "null" ? date.toLocaleDateString() : ""} editable={false} placeholder="mm.jj.aaaa"></TextInput>
+            <TouchableWithoutFeedback onPress={() => showDatepicker()}>
+              <Icons size={20} style={{ marginLeft: 15, paddingBottom: 15 }} color={colors.LIGHT_WHITE} name="calendar"></Icons>
+            </TouchableWithoutFeedback>
+          </View>
 
           {/* Input description */}
           <TextInput type="number" style={styles.textAmount} value={description} onChangeText={(value) => updateDescription(value)} placeholder="Description"></TextInput>
@@ -350,19 +390,19 @@ export default function componentName({ navigation: { goBack } }) {
         </View>
         <Overlay backdropStyle={styles.overLayBg} isVisible={isModalValiation} onBackdropPress={toggleOverlay}>
 
-          {transactionValid ? 
-            
-            <View style={{ width: 275, height: 285, paddingHorizontal:10}}>
-              <Text style={{ textAlign: 'center', fontSize: 18,paddingTop:5 }}>Transaction validée !</Text>
-              <View style={{alignItems:'center',justifyContent:'flex-start'}}><LottView loop={false} size={140} src={require('../../assets/wallet.json')} /></View>
-              <View style={{paddingBottom:5, marginTop:25}}>
-              <Button
+          {transactionValid ?
+
+            <View style={{ width: 275, height: 285, paddingHorizontal: 10 }}>
+              <Text style={{ textAlign: 'center', fontSize: 18, paddingTop: 5 }}>Transaction validée !</Text>
+              <View style={{ alignItems: 'center', justifyContent: 'flex-start' }}><LottView loop={false} size={140} src={require('../../assets/wallet.json')} /></View>
+              <View style={{ paddingBottom: 5, marginTop: 25 }}>
+                <Button
                   title="Nouvelle transaction"
                   type="outline"
                   onPress={() => endOfContinue()}
                   buttonStyle={styles.buttonOverlayOk}
                   titleStyle={styles.buttonSaveTitleOk}
-                  containerStyle={{marginBottom:5}}
+                  containerStyle={{ marginBottom: 5 }}
                 />
                 <Button
                   title="Quitter"
@@ -371,14 +411,14 @@ export default function componentName({ navigation: { goBack } }) {
                   buttonStyle={styles.buttonOverlayOk2}
                   titleStyle={styles.buttonSaveTitleOk2}
 
-                /> 
+                />
               </View>
-                       
+
             </View>
             :
             <View style={{ width: 285, height: 110 }}>
-              <Text style={{ textAlign: 'center',alignItems:'flex-end',paddingTop:10, fontSize: 20,flex:1 }}>Confimer la transaction?</Text>
-              <View style={{ flexDirection: 'row',alignItems:'center', marginLeft: 15,flex:1 }}>
+              <Text style={{ textAlign: 'center', alignItems: 'flex-end', paddingTop: 10, fontSize: 20, flex: 1 }}>Confimer la transaction?</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 15, flex: 1 }}>
                 <Button
                   title="Oui"
                   type="outline"
@@ -415,7 +455,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.CUS_WHITE
   },
-  overLayBg:{
+  overLayBg: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)'
   },
   prevText: {
@@ -462,7 +502,7 @@ const styles = StyleSheet.create({
   },
   textSolde: {
     textAlign: 'right',
-    fontSize: 50,
+    fontSize: 45,
     color: colors.GREEN
   },
   goBack: {
@@ -483,8 +523,16 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     height: 40,
     paddingLeft: 15,
+    paddingRight: 15,
     borderColor: colors.LIGHT_PRIMARY,
     backgroundColor: colors.LIGHT_PRIMARY
+  },
+  textAmountDate: {
+    fontSize: 18,
+    color: colors.GREEN,
+    marginBottom: 15,
+    height: 40,
+    paddingLeft: 5,
   },
   textAmountCurr: {
     borderRadius: 25,
@@ -525,31 +573,31 @@ const styles = StyleSheet.create({
   },
   buttonOverlay: {
     borderColor: colors.GREEN,
-    borderWidth:1.5,
+    borderWidth: 1.5,
     height: 40,
-    borderRadius:15,
+    borderRadius: 15,
     width: 115,
   },
   buttonOverlay2: {
     borderColor: colors.RED,
-    borderWidth:1.5,
+    borderWidth: 1.5,
     height: 40,
-    borderRadius:15,
+    borderRadius: 15,
     width: 115,
   },
   buttonOverlayOk: {
     borderColor: colors.GREEN,
-    borderWidth:1.5,
+    borderWidth: 1.5,
     height: 40,
-    borderRadius:15,
-    width:"100%"
+    borderRadius: 15,
+    width: "100%"
   },
   buttonOverlayOk2: {
     borderColor: colors.RED,
-    borderWidth:1.5,
-    borderRadius:15,
+    borderWidth: 1.5,
+    borderRadius: 15,
     height: 40,
-    width:"100%"
+    width: "100%"
   },
   buttonSaveTitle: {
     color: colors.GREEN,
@@ -576,11 +624,22 @@ const styles = StyleSheet.create({
     height: 40,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10
+  },
+  dateContainer: {
+    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 5
   },
   cautionText: {
     fontSize: 16,
     color: colors.CUS_WHITE,
     marginLeft: 5
+  },
+  dateText: {
+    fontSize: 16,
+    color: colors.CUS_WHITE,
+    marginLeft: 10
   }
 });
