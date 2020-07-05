@@ -27,6 +27,7 @@
     "android": {
       "package": "com.vouillozJonathan.kinit",
       "versionCode": 1
-    }
+    },
+    "description": ""
   }
 }

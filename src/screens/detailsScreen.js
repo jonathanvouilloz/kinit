@@ -1,9 +1,8 @@
 import React, { useState, useEffect} from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, ScrollView, Image, ActivityIndicator, Alert, Picker } from 'react-native';
 import colors from '../static/color'
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
-import {Picker} from '@react-native-community/picker'
 import { selectTransaction, recupCaution } from '../services/storeNewTransaction'
 import { useSelector, useDispatch } from 'react-redux'
 import { addcamp, addalltransa } from '../redux/campsApp'

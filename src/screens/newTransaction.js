@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView, Image, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TextInput, KeyboardAvoidingView, ScrollView, Image, ToastAndroid, Picker } from 'react-native';
 import colors from '../static/color'
 import * as ImagePicker from 'expo-image-picker';
 import Icons from 'react-native-vector-icons/AntDesign';
 import { Button, ButtonGroup, Overlay } from 'react-native-elements';
 import Constants from 'expo-constants';
 import CheckBox from '@react-native-community/checkbox'
-import { Picker } from '@react-native-community/picker';
+//import { Picker } from '@react-native-community/picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { insertTransaction } from "../services/storeNewTransaction"
 import { addtransa, addtransafirst, addcamp } from '../redux/campsApp'

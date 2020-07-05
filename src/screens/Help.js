@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Picker } from 'react-native';
 import colors from '../static/color'
 import { Divider } from 'react-native-elements';
-import {Picker} from '@react-native-community/picker';
+//import {Picker} from '@react-native-community/picker';
 
 
 export default function Help({ navigation }) {
@@ -21,7 +21,6 @@ export default function Help({ navigation }) {
         <View style={{ borderRadius: 25, overflow: 'hidden'}}>
  
           <Picker
-
             selectedValue={selectedValue}
             style={{ height: 40, backgroundColor:colors.LIGHT_PRIMARY, color:colors.CUS_WHITE }}
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
@@ -37,7 +36,7 @@ export default function Help({ navigation }) {
         </View>
         <View style={styles.containerInfosDetail}>
           <Text style={styles.titleInfos}>Téléphone 2</Text>
-          <Text style={styles.infos}>022.324.11.23</Text>
+          <Text style={styles.infos}>022.324.11.23s</Text>
         </View>
         <View style={styles.containerInfosDetail}>
           <Text style={styles.titleInfos}>Mail</Text>

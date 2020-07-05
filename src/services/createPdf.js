@@ -82,7 +82,7 @@ td {
     <div class="pres">
         <h1>Comptabilité ${name}</h1>
     </div> 
-    <div style="height:800px">
+    <div style="height:1800px">
     <table style="width: 1400px;margin-top:100px;">
     <thead>
         <tr>
@@ -106,7 +106,8 @@ td {
     `
 
     let soldeHisto = soldeInitial;
-    for (let i = 0; i < transactions.length; i++) {
+    let nbTab;
+        for (let i = 0; i < transactions.length; i++) {
         let soldeCalc;
         if (transactions[i].typeTransaction === 1) {
             soldeCalc = soldeHisto / 1 + transactions[i].montant / 1;
@@ -122,7 +123,7 @@ td {
             <td style="width: 700px;text-align:left"">${transactions[i].name}</td>
             <td style="width: 80px;">${transactions[i].typeTransaction === 1 ? transactions[i].montant : ''}</td>
             <td style="width: 80px;">${transactions[i].typeTransaction === 1 ? '' : transactions[i].montant}</td>
-            <td style="width: 90px;">${soldeCalc}</td>
+            <td style="width: 90px;">${parseFloat(soldeCalc).toFixed(2)}</td>
             </tr>
             `
         soldeHisto = soldeCalc;
